@@ -15,7 +15,6 @@ struct RecurringRuleEditorView: View {
 
     private let existingRule: RecurringTransactionRule?
     private let repository = RecurringRuleRepository()
-    private let recurringService = RecurringTransactionService()
 
     @State private var title: String
     @State private var amountText: String
@@ -28,7 +27,6 @@ struct RecurringRuleEditorView: View {
     @State private var selectedPersonID: UUID?
     @State private var errorMessage: String?
     @State private var showingDeleteConfirmation = false
-    @State private var saveFeedbackMessage: String?
 
     init(rule: RecurringTransactionRule?) {
         existingRule = rule
@@ -127,13 +125,6 @@ struct RecurringRuleEditorView: View {
                     }
                 }
 
-                if let saveFeedbackMessage {
-                    Section {
-                        Text(saveFeedbackMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                }
             }
             .scrollContentBackground(.hidden)
         }
@@ -218,16 +209,9 @@ struct RecurringRuleEditorView: View {
 
         do {
             try repository.upsert(existing: existingRule, draft: draft, in: modelContext)
-            let appliedCount = try recurringService.applyDueRules(in: modelContext)
-            if appliedCount > 0 {
-                saveFeedbackMessage = String(format: AppLocalizer.string("budget.fixed.appliedCount"), appliedCount)
-            } else {
-                saveFeedbackMessage = AppLocalizer.string("budget.fixed.saved")
-            }
             dismiss()
         } catch {
             errorMessage = error.localizedDescription
-            saveFeedbackMessage = nil
         }
     }
 

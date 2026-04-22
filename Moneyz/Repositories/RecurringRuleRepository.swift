@@ -14,11 +14,17 @@ struct RecurringRuleDraft {
 }
 
 struct RecurringRuleRepository {
+    private let calendar: Calendar
+
+    init(calendar: Calendar = .current) {
+        self.calendar = calendar
+    }
+
     func upsert(existing: RecurringTransactionRule?, draft: RecurringRuleDraft, in context: ModelContext) throws {
         let trimmedTitle = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedTitle.isEmpty else { return }
 
-        let normalizedNextRunDate = Calendar.current.startOfDay(for: draft.nextRunDate)
+        let normalizedNextRunDate = calendar.startOfDay(for: draft.nextRunDate)
 
         if let existing {
             existing.title = trimmedTitle

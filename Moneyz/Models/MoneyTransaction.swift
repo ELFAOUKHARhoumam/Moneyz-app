@@ -56,6 +56,8 @@ final class MoneyTransaction {
         if let customItemName, !customItemName.isEmpty { return customItemName }
         if let item { return item.name }
         if let category { return category.name }
-        return note.isEmpty ? "Transaction" : note
+        return note.isEmpty
+            ? AppLocalizer.string("transactions.fallbackTitle", fallback: "Transaction")
+            : note
     }
 }

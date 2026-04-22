@@ -6,11 +6,11 @@ import Combine
 final class GroceryViewModel: ObservableObject {
     @Published var currentListID: UUID?
     @Published var itemName = ""
-    @Published var groupName = "Other"
+    @Published var groupName = AppLocalizer.string("grocery.group.other", fallback: "Other")
     @Published var emoji = "🛒"
     @Published var saveAsPreset = true
     @Published var presetName = ""
-    @Published var presetGroupName = "Other"
+    @Published var presetGroupName = AppLocalizer.string("grocery.group.other", fallback: "Other")
     @Published var presetEmoji = "🛒"
     @Published var errorMessage: String?
 
@@ -89,7 +89,7 @@ final class GroceryViewModel: ObservableObject {
             }
 
             itemName = ""
-            groupName = "Other"
+            groupName = AppLocalizer.string("grocery.group.other", fallback: "Other")
             emoji = "🛒"
             saveAsPreset = true
             errorMessage = nil
@@ -125,7 +125,7 @@ final class GroceryViewModel: ObservableObject {
         do {
             try repository.addPreset(name: trimmedName, groupName: presetGroupName, emoji: presetEmoji, in: context)
             presetName = ""
-            presetGroupName = "Other"
+            presetGroupName = AppLocalizer.string("grocery.group.other", fallback: "Other")
             presetEmoji = "🛒"
             errorMessage = nil
         } catch {

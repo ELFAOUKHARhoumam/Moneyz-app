@@ -23,6 +23,7 @@
 "transactions.empty.message" = "أضف دخلًا أو مصروفًا لبدء التتبع.";
 "transactions.add" = "إضافة معاملة";
 "transactions.edit" = "تعديل المعاملة";
+"transactions.fallbackTitle" = "معاملة";
 "transactions.amount.placeholder" = "المبلغ";
 "transactions.type" = "النوع";
 "transactions.date" = "التاريخ";
@@ -105,6 +106,9 @@
 "grocery.empty.message" = "استخدم العناصر السريعة أو أنشئ عنصر بقالة مخصصًا.";
 "grocery.presetManager" = "العناصر القابلة لإعادة الاستخدام";
 "grocery.savePreset" = "حفظ عنصر قابل لإعادة الاستخدام";
+"grocery.list.thisWeek" = "هذا الأسبوع";
+"grocery.list.nextWeek" = "الأسبوع القادم";
+"grocery.group.other" = "أخرى";
 
 "settings.title" = "الإعدادات";
 "settings.profile" = "الملف الشخصي";
@@ -126,6 +130,8 @@
 "settings.data" = "البيانات";
 "settings.applyRecurring" = "تشغيل القواعد المتكررة المستحقة الآن";
 "settings.data.footer" = "يحافظ Moneyz على البيانات محليًا أولًا. المزامنة السحابية اختيارية وتعمل تلقائيًا عند توفر iCloud.";
+"settings.recurring.appliedCount" = "تم تطبيق %d معاملة متكررة.";
+"settings.recurring.noneDue" = "لا توجد معاملات متكررة مستحقة الآن.";
 
 "sync.checking" = "جارٍ التحقق";
 "sync.available" = "متاح";

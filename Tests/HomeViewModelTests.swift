@@ -1,3 +1,4 @@
+import SwiftData
 import XCTest
 @testable import Moneyz
 
@@ -35,5 +36,61 @@ private final class StubDashboardMetricsService: DashboardMetricsServing {
             intervalExpenseMinor: 0,
             intervalTransactionCount: 0
         )
+    }
+}
+
+@MainActor
+final class TransactionsViewModelActionTests: XCTestCase {
+    func testDeleteUsesInjectedAction() {
+        var deletedTransactionID: UUID?
+        let viewModel = TransactionsViewModel { transaction, _ in
+            deletedTransactionID = transaction.id
+        }
+        let context = ModelContext(PersistenceController.previewContainer())
+        let transaction = MoneyTransaction(amountMinor: 1_000, kind: .expense)
+
+        viewModel.delete(transaction, in: context)
+
+        XCTAssertEqual(deletedTransactionID, transaction.id)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testDeleteStoresErrorMessageWhenInjectedActionFails() {
+        let viewModel = TransactionsViewModel { _, _ in
+            throw NSError(domain: "TransactionsViewModelTests", code: 1, userInfo: [NSLocalizedDescriptionKey: "Delete failed"])
+        }
+        let context = ModelContext(PersistenceController.previewContainer())
+
+        viewModel.delete(MoneyTransaction(amountMinor: 500, kind: .expense), in: context)
+
+        XCTAssertEqual(viewModel.errorMessage, "Delete failed")
+    }
+}
+
+@MainActor
+final class BudgetViewModelActionTests: XCTestCase {
+    func testDeleteRuleUsesInjectedAction() {
+        var deletedRuleID: UUID?
+        let viewModel = BudgetViewModel { rule, _ in
+            deletedRuleID = rule.id
+        }
+        let context = ModelContext(PersistenceController.previewContainer())
+        let rule = RecurringTransactionRule(title: "Rent", amountMinor: 80_000, nextRunDate: .now)
+
+        viewModel.delete(rule, in: context)
+
+        XCTAssertEqual(deletedRuleID, rule.id)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testDeleteRuleStoresErrorMessageWhenInjectedActionFails() {
+        let viewModel = BudgetViewModel { _, _ in
+            throw NSError(domain: "BudgetViewModelTests", code: 1, userInfo: [NSLocalizedDescriptionKey: "Rule delete failed"])
+        }
+        let context = ModelContext(PersistenceController.previewContainer())
+
+        viewModel.delete(RecurringTransactionRule(title: "Salary", amountMinor: 125_000, kind: .income, nextRunDate: .now), in: context)
+
+        XCTAssertEqual(viewModel.errorMessage, "Rule delete failed")
     }
 }

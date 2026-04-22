@@ -11,9 +11,16 @@ final class SettingsViewModel: ObservableObject {
             switch self {
             case .success(let appliedCount):
                 if appliedCount > 0 {
-                    return "Applied \(appliedCount) recurring transaction(s)."
+                    return AppLocalizer.formattedString(
+                        "settings.recurring.appliedCount",
+                        fallback: "Applied %d recurring transaction(s).",
+                        appliedCount
+                    )
                 }
-                return "No recurring transactions were due."
+                return AppLocalizer.string(
+                    "settings.recurring.noneDue",
+                    fallback: "No recurring transactions were due."
+                )
             case .failure(let message):
                 return message
             }

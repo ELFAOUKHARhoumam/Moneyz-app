@@ -156,7 +156,9 @@ enum SeedDataSeeder {
             let recurring = RecurringTransactionRule(title: "Rent", amountMinor: 80000, kind: .expense, frequency: .monthly, nextRunDate: calendar.date(byAdding: .month, value: 1, to: monthStart) ?? now, note: "Monthly rent", category: refs.home, item: refs.rent, person: family)
             context.insert(recurring)
 
-            let groceryList = GroceryList(title: "This Week")
+            let groceryList = GroceryList(
+                title: AppLocalizer.string("grocery.list.thisWeek", fallback: "This Week")
+            )
             context.insert(groceryList)
             [
                 GroceryListItem(name: "Milk", groupName: "Dairy", emoji: "🥛", sortOrder: 0, list: groceryList),

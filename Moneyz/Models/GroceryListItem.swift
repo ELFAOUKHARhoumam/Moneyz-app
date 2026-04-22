@@ -18,7 +18,7 @@ final class GroceryListItem {
     init(
         id: UUID = UUID(),
         name: String,
-        groupName: String = "Other",
+        groupName: String = AppLocalizer.string("grocery.group.other", fallback: "Other"),
         emoji: String = "🛒",
         note: String = "",
         isChecked: Bool = false,

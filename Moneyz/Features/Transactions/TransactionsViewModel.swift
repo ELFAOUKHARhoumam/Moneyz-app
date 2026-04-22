@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftData
 
 @MainActor
 final class TransactionsViewModel: ObservableObject {
@@ -25,6 +26,16 @@ final class TransactionsViewModel: ObservableObject {
     @Published var showingGrocery = false
     @Published var editingTransaction: MoneyTransaction?
     @Published var errorMessage: String?
+
+    private let deleteTransactionAction: @MainActor (MoneyTransaction, ModelContext) throws -> Void
+
+    init(
+        deleteTransactionAction: (@MainActor (MoneyTransaction, ModelContext) throws -> Void)? = nil
+    ) {
+        self.deleteTransactionAction = deleteTransactionAction ?? { transaction, context in
+            try TransactionRepository().delete(transaction, in: context)
+        }
+    }
 
     var activeFilterSummaryKey: String {
         switch filter {
@@ -60,6 +71,15 @@ final class TransactionsViewModel: ObservableObject {
             ].joined(separator: " ").lowercased()
 
             return haystack.contains(searchText.lowercased())
+        }
+    }
+
+    func delete(_ transaction: MoneyTransaction, in context: ModelContext) {
+        do {
+            try deleteTransactionAction(transaction, context)
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

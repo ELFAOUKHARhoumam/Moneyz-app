@@ -34,6 +34,7 @@
 "transactions.summary.income" = "Showing income only";
 "transactions.add" = "Add Transaction";
 "transactions.edit" = "Edit Transaction";
+"transactions.fallbackTitle" = "Transaction";
 "transactions.amount.placeholder" = "Amount";
 "transactions.type" = "Type";
 "transactions.date" = "Date";
@@ -124,6 +125,9 @@
 "grocery.empty.message" = "Use quick add presets or create a custom grocery item.";
 "grocery.presetManager" = "Reusable Items";
 "grocery.savePreset" = "Save reusable item";
+"grocery.list.thisWeek" = "This Week";
+"grocery.list.nextWeek" = "Next Week";
+"grocery.group.other" = "Other";
 
 "settings.title" = "Settings";
 "settings.profile" = "Profile";
@@ -145,6 +149,8 @@
 "settings.data" = "Data";
 "settings.applyRecurring" = "Apply due recurring rules now";
 "settings.data.footer" = "Moneyz keeps data available offline first. Cloud sync is optional and automatic when iCloud is available.";
+"settings.recurring.appliedCount" = "Applied %d recurring transaction(s).";
+"settings.recurring.noneDue" = "No recurring transactions were due.";
 
 "sync.checking" = "Checking";
 "sync.available" = "Available";

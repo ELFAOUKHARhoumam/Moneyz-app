@@ -21,7 +21,6 @@ struct BudgetView: View {
     private var recurringRules: [RecurringTransactionRule]
 
     @StateObject private var viewModel: BudgetViewModel
-    private let recurringRepository = RecurringRuleRepository()
 
     private var snapshots: [PersonBudgetSnapshot] {
         viewModel.snapshots(people: people, transactions: transactions, settings: settings)
@@ -89,7 +88,7 @@ struct BudgetView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
-                                        deleteRule(rule)
+                                        viewModel.delete(rule, in: modelContext)
                                     } label: {
                                         Label(AppLocalizer.string("common.delete"), systemImage: "trash")
                                     }
@@ -151,25 +150,6 @@ struct BudgetView: View {
                 Text(viewModel.errorMessage ?? "")
             }
         )
-        .onAppear {
-            applyDueRulesIfNeeded()
-        }
-    }
-
-    private func deleteRule(_ rule: RecurringTransactionRule) {
-        do {
-            try recurringRepository.delete(rule, in: modelContext)
-        } catch {
-            viewModel.errorMessage = error.localizedDescription
-        }
-    }
-
-    private func applyDueRulesIfNeeded() {
-        do {
-            _ = try RecurringTransactionService().applyDueRules(in: modelContext)
-        } catch {
-            viewModel.errorMessage = error.localizedDescription
-        }
     }
 
     private func headerRow(title: String, actionTitle: String, action: @escaping () -> Void) -> some View {

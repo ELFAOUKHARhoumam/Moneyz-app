@@ -15,7 +15,7 @@ final class RecurringRuleRepositoryTests: XCTestCase {
     func testUpsertTrimsTitleAndNormalizesNextRunDate() throws {
         let container = try makeContainer()
         let context = ModelContext(container)
-        let repository = RecurringRuleRepository()
+        let repository = RecurringRuleRepository(calendar: calendar)
 
         let draft = RecurringRuleDraft(
             title: "  Salary  ",

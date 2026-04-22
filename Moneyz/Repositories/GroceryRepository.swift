@@ -8,7 +8,9 @@ struct GroceryRepository {
             return list
         }
 
-        let list = GroceryList(title: "This Week")
+        let list = GroceryList(
+            title: AppLocalizer.string("grocery.list.thisWeek", fallback: "This Week")
+        )
         context.insert(list)
         try context.save()
         return list
@@ -27,7 +29,9 @@ struct GroceryRepository {
 
         let item = GroceryListItem(
             name: trimmedName,
-            groupName: groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Other" : groupName,
+            groupName: groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? AppLocalizer.string("grocery.group.other", fallback: "Other")
+                : groupName,
             emoji: emoji.isEmpty ? "🛒" : emoji,
             sortOrder: list.items.count,
             list: list,
@@ -49,7 +53,9 @@ struct GroceryRepository {
         currentList.isArchived = true
         currentList.updatedAt = .now
 
-        let list = GroceryList(title: "Next Week")
+        let list = GroceryList(
+            title: AppLocalizer.string("grocery.list.nextWeek", fallback: "Next Week")
+        )
         context.insert(list)
         try context.save()
         return list
@@ -58,7 +64,9 @@ struct GroceryRepository {
     func addPreset(name: String, groupName: String, emoji: String, in context: ModelContext) throws {
         let preset = GroceryPresetItem(
             name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            groupName: groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Other" : groupName,
+            groupName: groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? AppLocalizer.string("grocery.group.other", fallback: "Other")
+                : groupName,
             emoji: emoji.isEmpty ? "🛒" : emoji
         )
         context.insert(preset)

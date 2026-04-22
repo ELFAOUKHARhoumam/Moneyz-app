@@ -43,4 +43,21 @@ enum AppLocalizer {
 
         return localized
     }
+
+    static func string(_ key: String, fallback: String, languageCode: String? = nil) -> String {
+        let localized = string(key, languageCode: languageCode)
+        return localized == key ? fallback : localized
+    }
+
+    static func formattedString(
+        _ key: String,
+        fallback: String,
+        _ arguments: CVarArg...,
+        languageCode: String? = nil
+    ) -> String {
+        let format = string(key, fallback: fallback, languageCode: languageCode)
+        let localeIdentifier = languageCode ?? currentLanguageCode() ?? Locale.autoupdatingCurrent.identifier
+        let locale = Locale(identifier: localeIdentifier)
+        return String(format: format, locale: locale, arguments: arguments)
+    }
 }

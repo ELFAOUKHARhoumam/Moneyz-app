@@ -13,7 +13,6 @@ struct TransactionsView: View {
     private var transactions: [MoneyTransaction]
 
     @StateObject private var viewModel: TransactionsViewModel
-    private let repository = TransactionRepository()
 
     private var filteredTransactions: [MoneyTransaction] {
         viewModel.filteredTransactions(from: transactions)
@@ -67,7 +66,7 @@ struct TransactionsView: View {
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
-                                    delete(transaction)
+                                    viewModel.delete(transaction, in: modelContext)
                                 } label: {
                                     Label(AppLocalizer.string("common.delete"), systemImage: "trash")
                                 }
@@ -152,14 +151,6 @@ struct TransactionsView: View {
                     AddEditTransactionView(transaction: transaction)
                 }
             }
-        }
-    }
-
-    private func delete(_ transaction: MoneyTransaction) {
-        do {
-            try repository.delete(transaction, in: modelContext)
-        } catch {
-            viewModel.errorMessage = error.localizedDescription
         }
     }
 }

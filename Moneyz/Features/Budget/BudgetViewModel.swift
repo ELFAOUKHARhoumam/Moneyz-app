@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftData
 
 @MainActor
 final class BudgetViewModel: ObservableObject {
@@ -11,6 +12,15 @@ final class BudgetViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let insightsService = BudgetInsightsService()
+    private let deleteRuleAction: @MainActor (RecurringTransactionRule, ModelContext) throws -> Void
+
+    init(
+        deleteRuleAction: (@MainActor (RecurringTransactionRule, ModelContext) throws -> Void)? = nil
+    ) {
+        self.deleteRuleAction = deleteRuleAction ?? { rule, context in
+            try RecurringRuleRepository().delete(rule, in: context)
+        }
+    }
 
     func interval(settings: SettingsStore) -> DateInterval {
         DateRangeService.interval(
@@ -40,5 +50,14 @@ final class BudgetViewModel: ObservableObject {
     func presentRuleEditor(for rule: RecurringTransactionRule? = nil) {
         editingRule = rule
         showingRuleEditor = true
+    }
+
+    func delete(_ rule: RecurringTransactionRule, in context: ModelContext) {
+        do {
+            try deleteRuleAction(rule, context)
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }
