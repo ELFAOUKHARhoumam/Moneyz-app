@@ -1,0 +1,55 @@
+# macOS
+.DS_Store
+
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+
+# Build products
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+# Fastlane / screenshots
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# CocoaPods / Carthage
+Pods/
+Carthage/Build/
+
+# Archives and signing artifacts
+*.xcarchive
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.mobileprovision
+*.p12
+*.cer
+*.pem
+
+# Environment / secrets
+.env
+.env.*
+
+# Local tools
+.swiftpm/
+
+# Nested Xcode user data
+**/xcuserdata/
+**/*.xcuserstate

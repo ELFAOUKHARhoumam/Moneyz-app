@@ -1,0 +1,248 @@
+"tab.home" = "Home";
+"tab.transactions" = "Transactions";
+"tab.budget" = "Budget";
+"tab.debt" = "Debt";
+"tab.settings" = "Settings";
+
+"home.title" = "Home";
+"home.greeting" = "Welcome back";
+"home.hello" = "Hello";
+"home.recentTransactions" = "Recent Transactions";
+"home.empty.title" = "No transactions yet";
+"home.empty.message" = "Start with one quick entry and Moneyz will build your daily timeline.";
+"home.savings.title" = "Savings";
+"home.savings.positive" = "You stayed ahead this period.";
+"home.savings.negative" = "Spending is above income this period.";
+"home.activity.title" = "Spending Pulse";
+"home.activity.count" = "entries in range";
+"home.burnRate" = "Burn Rate";
+"home.burnRate.footer" = "Shows how much of your current-period income has already been spent.";
+
+"dashboard.balance" = "Balance";
+"dashboard.income" = "Income";
+"dashboard.expense" = "Expenses";
+"dashboard.netDebt" = "Net Debt";
+
+"transactions.title" = "Transactions";
+"transactions.search" = "Search transactions";
+"transactions.filter" = "Filter";
+"transactions.empty.title" = "Nothing to show";
+"transactions.empty.message" = "Add an income or expense to start tracking.";
+"transactions.summary.all" = "Showing all transactions";
+"transactions.summary.searching" = "Filtered by your search";
+"transactions.summary.expense" = "Showing expenses only";
+"transactions.summary.income" = "Showing income only";
+"transactions.add" = "Add Transaction";
+"transactions.edit" = "Edit Transaction";
+"transactions.amount.placeholder" = "Amount";
+"transactions.type" = "Type";
+"transactions.date" = "Date";
+"transactions.categorySection" = "Category";
+"transactions.category" = "Category";
+"transactions.item" = "Item";
+"transactions.customItem" = "Custom item name";
+"transactions.personSection" = "Person";
+"transactions.person" = "Person";
+"transactions.note" = "Notes";
+
+"transaction.kind.expense" = "Expense";
+"transaction.kind.income" = "Income";
+
+"categories.title" = "Categories";
+"categories.addCategory" = "Add Category";
+"categories.addItem" = "Add Item";
+"categories.name" = "Name";
+"categories.group" = "Group";
+"categories.emoji" = "Emoji";
+"categories.kind" = "Kind";
+"categories.empty.items" = "No saved items yet.";
+
+"budget.title" = "Budget";
+"budget.people" = "People Budgets";
+"budget.empty.title" = "No people budgets yet";
+"budget.empty.message" = "Create a person and assign a budget to track household spending.";
+"budget.person.add" = "Add Person";
+"budget.person.edit" = "Edit Person";
+"budget.person.details" = "Person";
+"budget.person.name" = "Person name";
+"budget.person.emoji" = "Emoji";
+"budget.plan.details" = "Budget Plan";
+"budget.plan.amount" = "Budget amount";
+"budget.plan.period" = "Budget period";
+"budget.plan.salaryCycleStart" = "Salary cycle starts on day";
+"budget.plan.defaultTitle" = "Budget";
+"budget.spent" = "Spent";
+"budget.limit" = "Limit";
+"budget.remaining" = "Remaining";
+"budget.status.notStarted" = "No spending recorded yet.";
+"budget.status.onTrack" = "On track for this period.";
+"budget.status.warning" = "Close to the budget limit.";
+"budget.status.exceeded" = "Budget limit reached.";
+"budget.fixed.title" = "Recurring Items";
+"budget.fixed.add" = "Add Recurring Item";
+"budget.fixed.edit" = "Edit Recurring Item";
+"budget.fixed.details" = "Recurring Item";
+"budget.fixed.amount" = "Amount";
+"budget.fixed.frequency" = "Frequency";
+"budget.fixed.nextDate" = "Next run date";
+"budget.fixed.footer" = "Recurring items can be expense or income. Due items create transactions automatically, and you can tap any row to edit or delete it.";
+"budget.fixed.empty.title" = "No recurring items yet";
+"budget.fixed.empty.message" = "Add recurring rules for rent, subscriptions, loans, and salary.";
+"budget.fixed.saved" = "Recurring rule saved.";
+"budget.fixed.appliedCount" = "Recurring rule saved and %d due transaction(s) were applied.";
+
+"debt.title" = "Debt";
+"debt.filter" = "Filter";
+"debt.add" = "Add Debt";
+"debt.edit" = "Edit Debt";
+"debt.details" = "Debt Details";
+"debt.counterparty" = "Person or company";
+"debt.amount" = "Amount";
+"debt.direction" = "Direction";
+"debt.status" = "Status";
+"debt.issueDate" = "Issue date";
+"debt.includeDueDate" = "Set due date";
+"debt.dueDate" = "Due date";
+"debt.empty.title" = "No debts found";
+"debt.empty.message" = "Track what you owe and what others owe you in one place.";
+"debt.summary.openItems" = "Open items:";
+"debt.summary.overdue" = "Overdue";
+"debt.summary.dueSoon" = "Due soon";
+"debt.direction.iOwe" = "I owe";
+"debt.direction.owedToMe" = "Owed to me";
+
+"grocery.title" = "Grocery Mode";
+"grocery.quickAdd" = "Quick Add";
+"grocery.addItem" = "Add Grocery Item";
+"grocery.addToList" = "Add to List";
+"grocery.itemName" = "Item name";
+"grocery.group" = "Group";
+"grocery.emoji" = "Emoji";
+"grocery.saveReusable" = "Save as reusable item";
+"grocery.newWeek" = "New week";
+"grocery.empty.title" = "Your list is empty";
+"grocery.empty.message" = "Use quick add presets or create a custom grocery item.";
+"grocery.presetManager" = "Reusable Items";
+"grocery.savePreset" = "Save reusable item";
+
+"settings.title" = "Settings";
+"settings.profile" = "Profile";
+"settings.name" = "Display name";
+"settings.currency" = "Currency code";
+"settings.openingBalance" = "Opening balance";
+"settings.salaryCycleStart" = "Salary cycle starts on day";
+"settings.appearance" = "Appearance";
+"settings.theme" = "Theme";
+"settings.language" = "Language";
+"settings.security" = "Security";
+"settings.faceID" = "Lock with Face ID";
+"settings.faceID.subtitle" = "Use Face ID or device passcode before showing sensitive financial data.";
+"settings.faceID.unlock" = "Unlock Moneyz";
+"settings.faceID.unavailable" = "Biometric authentication is not available on this device.";
+"settings.sync" = "iCloud Sync";
+"settings.sync.status" = "Status";
+"settings.sync.refresh" = "Refresh sync status";
+"settings.data" = "Data";
+"settings.applyRecurring" = "Apply due recurring rules now";
+"settings.data.footer" = "Moneyz keeps data available offline first. Cloud sync is optional and automatic when iCloud is available.";
+
+"sync.checking" = "Checking";
+"sync.available" = "Available";
+"sync.unavailable" = "Unavailable";
+"sync.noAccount" = "No iCloud account";
+"sync.restricted" = "Restricted";
+"sync.temporarilyUnavailable" = "Temporarily unavailable";
+"sync.error" = "Error";
+
+"theme.system" = "System";
+"theme.light" = "Light";
+"theme.dark" = "Dark";
+
+"language.system" = "System";
+"language.english" = "English";
+"language.arabic" = "Arabic";
+
+"time.range" = "Time Range";
+"category.kind.expense" = "Expense";
+"category.kind.income" = "Income";
+"category.kind.both" = "Both";
+
+"frequency.weekly" = "Weekly";
+"frequency.monthly" = "Monthly";
+"frequency.yearly" = "Yearly";
+"time.month" = "Month";
+"time.year" = "Year";
+"time.salaryCycle" = "Salary Cycle";
+
+"filter.all" = "All";
+
+"status.open" = "Open";
+"status.partial" = "Partial";
+"status.settled" = "Settled";
+
+"common.save" = "Save";
+"common.cancel" = "Cancel";
+"common.done" = "Done";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.none" = "None";
+"common.archive" = "Archive";
+
+"validation.amount" = "Enter a valid amount.";
+"validation.name" = "Enter a valid name.";
+"sync.notConfigured" = "Not configured";
+"sync.notConfigured.detail" = "Enable the iCloud + CloudKit capability in Xcode to use sync. Moneyz will continue working fully offline.";
+
+"settings.currency" = "Currency";
+"settings.pin" = "Lock with PIN";
+"settings.pin.change" = "Change PIN";
+"settings.pin.enabled" = "PIN lock is enabled for this device.";
+
+"onboarding.title" = "Set up Moneyz";
+"onboarding.subtitle" = "Start with the basics so the app feels personal from the first launch.";
+"onboarding.name" = "What should Moneyz call you?";
+"onboarding.currency" = "Choose your main currency";
+"onboarding.paycheckDay" = "When is your paycheck day?";
+"onboarding.paycheckValue" = "Paycheck day:";
+"onboarding.enablePIN" = "Protect the app with a 4-digit PIN";
+"onboarding.pinRequired" = "Set a 4-digit PIN before continuing.";
+"onboarding.continue" = "Continue";
+
+"lock.title" = "Unlock Moneyz";
+"lock.subtitle.pin" = "Enter your 4-digit PIN to open your money dashboard.";
+"lock.biometricReason" = "Unlock Moneyz to view your finances.";
+"lock.unlockWithPIN" = "Unlock with PIN";
+
+"pin.title.create" = "Create PIN";
+"pin.title.change" = "Change PIN";
+"pin.code" = "4-digit PIN";
+"pin.new" = "New 4-digit PIN";
+"pin.confirm" = "Confirm PIN";
+"pin.footer" = "Use a simple 4-digit PIN for quick access. You can change or remove it later in Settings.";
+"pin.setupNow" = "Set PIN now";
+"pin.action.save" = "Save PIN";
+"pin.action.update" = "Update PIN";
+"pin.validation.length" = "Enter a valid 4-digit PIN.";
+"pin.validation.match" = "PIN entries do not match.";
+"pin.validation.invalid" = "The PIN you entered is incorrect.";
+"pin.saveFailed" = "Unable to save the PIN right now. Please try again.";
+
+"dashboard.overview" = "Overview";
+
+"dashboard.style.label" = "Display style";
+
+"dashboard.style.cards" = "Cards";
+
+"dashboard.style.ring" = "Ring";
+
+"common.deleteConfirmTitle" = "Delete this item?";
+
+"common.deleteConfirmMessage" = "This action cannot be undone.";
+
+"lock.pin.empty" = "No PIN entered";
+"lock.pin.digitsEntered" = "%d of 4 digits entered";
+"lock.pin.hint" = "Enter your 4-digit PIN to unlock Moneyz.";
+"lock.pin.blockedCountdown" = "Try again in %d seconds.";
+"onboarding.paycheckStepper.hint" = "Adjust the day of the month when your salary cycle starts.";
+"onboarding.pinToggle.hint" = "Turn on PIN protection during setup.";
+"onboarding.continue.hint" = "Finish setup and open the app.";

@@ -1,0 +1,229 @@
+"tab.home" = "الرئيسية";
+"tab.transactions" = "المعاملات";
+"tab.budget" = "الميزانية";
+"tab.debt" = "الديون";
+"tab.settings" = "الإعدادات";
+
+"home.title" = "الرئيسية";
+"home.greeting" = "مرحبًا بعودتك";
+"home.hello" = "أهلًا";
+"home.recentTransactions" = "أحدث المعاملات";
+"home.empty.title" = "لا توجد معاملات بعد";
+"home.empty.message" = "ابدأ بإضافة عملية واحدة وسيبني Moneyz خطك اليومي تلقائيًا.";
+
+"dashboard.balance" = "الرصيد";
+"dashboard.income" = "الدخل";
+"dashboard.expense" = "المصروفات";
+"dashboard.netDebt" = "صافي الدين";
+
+"transactions.title" = "المعاملات";
+"transactions.search" = "ابحث في المعاملات";
+"transactions.filter" = "التصفية";
+"transactions.empty.title" = "لا يوجد شيء لعرضه";
+"transactions.empty.message" = "أضف دخلًا أو مصروفًا لبدء التتبع.";
+"transactions.add" = "إضافة معاملة";
+"transactions.edit" = "تعديل المعاملة";
+"transactions.amount.placeholder" = "المبلغ";
+"transactions.type" = "النوع";
+"transactions.date" = "التاريخ";
+"transactions.categorySection" = "الفئة";
+"transactions.category" = "الفئة";
+"transactions.item" = "العنصر";
+"transactions.customItem" = "اسم عنصر مخصص";
+"transactions.personSection" = "الشخص";
+"transactions.person" = "الشخص";
+"transactions.note" = "ملاحظات";
+
+"transaction.kind.expense" = "مصروف";
+"transaction.kind.income" = "دخل";
+
+"categories.title" = "الفئات";
+"categories.addCategory" = "إضافة فئة";
+"categories.addItem" = "إضافة عنصر";
+"categories.name" = "الاسم";
+"categories.group" = "المجموعة";
+"categories.emoji" = "رمز تعبيري";
+"categories.kind" = "النوع";
+"categories.empty.items" = "لا توجد عناصر محفوظة بعد.";
+
+"budget.title" = "الميزانية";
+"budget.people" = "ميزانيات الأشخاص";
+"budget.empty.title" = "لا توجد ميزانيات للأشخاص";
+"budget.empty.message" = "أنشئ شخصًا وحدد ميزانية لمتابعة مصروفات الأسرة.";
+"budget.person.add" = "إضافة شخص";
+"budget.person.edit" = "تعديل الشخص";
+"budget.person.details" = "الشخص";
+"budget.person.name" = "اسم الشخص";
+"budget.person.emoji" = "رمز تعبيري";
+"budget.plan.details" = "خطة الميزانية";
+"budget.plan.amount" = "مبلغ الميزانية";
+"budget.plan.period" = "فترة الميزانية";
+"budget.plan.salaryCycleStart" = "تبدأ دورة الراتب في اليوم";
+"budget.plan.defaultTitle" = "ميزانية";
+"budget.spent" = "المصروف";
+"budget.limit" = "الحد";
+"budget.remaining" = "المتبقي";
+"budget.fixed.title" = "العناصر المتكررة";
+"budget.fixed.add" = "إضافة عنصر متكرر";
+"budget.fixed.edit" = "تعديل عنصر متكرر";
+"budget.fixed.details" = "عنصر متكرر";
+"budget.fixed.amount" = "المبلغ";
+"budget.fixed.frequency" = "التكرار";
+"budget.fixed.nextDate" = "تاريخ التشغيل القادم";
+"budget.fixed.footer" = "يمكن أن تكون العناصر المتكررة دخلًا أو مصروفًا. تُنشأ العناصر المستحقة معاملات تلقائيًا، ويمكنك الضغط على أي صف لتعديله أو حذفه.";
+"budget.fixed.empty.title" = "لا توجد عناصر متكررة";
+"budget.fixed.empty.message" = "أضف قواعد متكررة للإيجار والاشتراكات والقروض والراتب.";
+
+"debt.title" = "الديون";
+"debt.filter" = "التصفية";
+"debt.add" = "إضافة دين";
+"debt.edit" = "تعديل الدين";
+"debt.details" = "تفاصيل الدين";
+"debt.counterparty" = "الشخص أو الجهة";
+"debt.amount" = "المبلغ";
+"debt.direction" = "الاتجاه";
+"debt.status" = "الحالة";
+"debt.issueDate" = "تاريخ البداية";
+"debt.includeDueDate" = "تحديد تاريخ استحقاق";
+"debt.dueDate" = "تاريخ الاستحقاق";
+"debt.empty.title" = "لا توجد ديون";
+"debt.empty.message" = "تابع ما عليك وما لك في مكان واحد.";
+"debt.summary.openItems" = "العناصر المفتوحة:";
+"debt.direction.iOwe" = "عليّ";
+"debt.direction.owedToMe" = "لي عند الغير";
+
+"grocery.title" = "وضع البقالة";
+"grocery.quickAdd" = "إضافة سريعة";
+"grocery.addItem" = "إضافة عنصر بقالة";
+"grocery.addToList" = "إضافة إلى القائمة";
+"grocery.itemName" = "اسم العنصر";
+"grocery.group" = "المجموعة";
+"grocery.emoji" = "رمز تعبيري";
+"grocery.saveReusable" = "حفظ كعنصر قابل لإعادة الاستخدام";
+"grocery.newWeek" = "أسبوع جديد";
+"grocery.empty.title" = "قائمتك فارغة";
+"grocery.empty.message" = "استخدم العناصر السريعة أو أنشئ عنصر بقالة مخصصًا.";
+"grocery.presetManager" = "العناصر القابلة لإعادة الاستخدام";
+"grocery.savePreset" = "حفظ عنصر قابل لإعادة الاستخدام";
+
+"settings.title" = "الإعدادات";
+"settings.profile" = "الملف الشخصي";
+"settings.name" = "الاسم المعروض";
+"settings.currency" = "رمز العملة";
+"settings.openingBalance" = "الرصيد الافتتاحي";
+"settings.salaryCycleStart" = "تبدأ دورة الراتب في اليوم";
+"settings.appearance" = "المظهر";
+"settings.theme" = "السمة";
+"settings.language" = "اللغة";
+"settings.security" = "الأمان";
+"settings.faceID" = "القفل عبر Face ID";
+"settings.faceID.subtitle" = "استخدم Face ID أو رمز مرور الجهاز قبل عرض البيانات المالية الحساسة.";
+"settings.faceID.unlock" = "فتح Moneyz";
+"settings.faceID.unavailable" = "المصادقة الحيوية غير متاحة على هذا الجهاز.";
+"settings.sync" = "مزامنة iCloud";
+"settings.sync.status" = "الحالة";
+"settings.sync.refresh" = "تحديث حالة المزامنة";
+"settings.data" = "البيانات";
+"settings.applyRecurring" = "تشغيل القواعد المتكررة المستحقة الآن";
+"settings.data.footer" = "يحافظ Moneyz على البيانات محليًا أولًا. المزامنة السحابية اختيارية وتعمل تلقائيًا عند توفر iCloud.";
+
+"sync.checking" = "جارٍ التحقق";
+"sync.available" = "متاح";
+"sync.unavailable" = "غير متاح";
+"sync.noAccount" = "لا يوجد حساب iCloud";
+"sync.restricted" = "مقيد";
+"sync.temporarilyUnavailable" = "غير متاح مؤقتًا";
+"sync.error" = "خطأ";
+
+"theme.system" = "النظام";
+"theme.light" = "فاتح";
+"theme.dark" = "داكن";
+
+"language.system" = "النظام";
+"language.english" = "الإنجليزية";
+"language.arabic" = "العربية";
+
+"time.range" = "النطاق الزمني";
+"category.kind.expense" = "مصروف";
+"category.kind.income" = "دخل";
+"category.kind.both" = "كلاهما";
+
+"frequency.weekly" = "أسبوعي";
+"frequency.monthly" = "شهري";
+"frequency.yearly" = "سنوي";
+"time.month" = "شهر";
+"time.year" = "سنة";
+"time.salaryCycle" = "دورة الراتب";
+
+"filter.all" = "الكل";
+
+"status.open" = "مفتوح";
+"status.partial" = "جزئي";
+"status.settled" = "مسدد";
+
+"common.save" = "حفظ";
+"common.cancel" = "إلغاء";
+"common.done" = "تم";
+"common.delete" = "حذف";
+"common.edit" = "تعديل";
+"common.none" = "لا شيء";
+"common.archive" = "أرشفة";
+
+"validation.amount" = "أدخل مبلغًا صحيحًا.";
+"validation.name" = "أدخل اسمًا صحيحًا.";
+"sync.notConfigured" = "غير مهيأ";
+"sync.notConfigured.detail" = "فعّل iCloud و CloudKit من Xcode لاستخدام المزامنة. سيستمر Moneyz بالعمل دون اتصال بشكل كامل.";
+
+"settings.currency" = "العملة";
+"settings.pin" = "القفل برمز سري";
+"settings.pin.change" = "تغيير الرمز السري";
+"settings.pin.enabled" = "تم تفعيل القفل بالرمز السري على هذا الجهاز.";
+
+"onboarding.title" = "إعداد Moneyz";
+"onboarding.subtitle" = "ابدأ بالأساسيات ليصبح التطبيق مناسبًا لك من أول تشغيل.";
+"onboarding.name" = "بأي اسم تريد أن يناديك Moneyz؟";
+"onboarding.currency" = "اختر العملة الأساسية";
+"onboarding.paycheckDay" = "متى يكون يوم استلام الراتب؟";
+"onboarding.paycheckValue" = "يوم الراتب:";
+"onboarding.enablePIN" = "حماية التطبيق برمز PIN مكوّن من 4 أرقام";
+"onboarding.pinRequired" = "اضبط رمز PIN من 4 أرقام قبل المتابعة.";
+"onboarding.continue" = "متابعة";
+
+"lock.title" = "فتح Moneyz";
+"lock.subtitle.pin" = "أدخل الرمز السري المكوّن من 4 أرقام لفتح التطبيق.";
+"lock.biometricReason" = "افتح Moneyz لعرض بياناتك المالية.";
+"lock.unlockWithPIN" = "فتح بالرمز السري";
+
+"pin.title.create" = "إنشاء رمز سري";
+"pin.title.change" = "تغيير الرمز السري";
+"pin.code" = "رمز PIN من 4 أرقام";
+"pin.new" = "رمز سري جديد من 4 أرقام";
+"pin.confirm" = "تأكيد الرمز السري";
+"pin.footer" = "استخدم رمزًا سريًا بسيطًا من 4 أرقام للوصول السريع. يمكنك تغييره أو إزالته لاحقًا من الإعدادات.";
+"pin.setupNow" = "إعداد الرمز السري الآن";
+"pin.action.save" = "حفظ الرمز";
+"pin.action.update" = "تحديث الرمز";
+"pin.validation.length" = "أدخل رمزًا سريًا صالحًا من 4 أرقام.";
+"pin.validation.match" = "الرمزان السريان غير متطابقين.";
+"pin.validation.invalid" = "الرمز السري الذي أدخلته غير صحيح.";
+"pin.saveFailed" = "تعذّر حفظ رمز PIN الآن. حاول مرة أخرى.";
+
+"dashboard.overview" = "نظرة عامة";
+
+"dashboard.style.label" = "طريقة العرض";
+
+"dashboard.style.cards" = "بطاقات";
+
+"dashboard.style.ring" = "حلقة";
+
+"common.deleteConfirmTitle" = "حذف هذا العنصر؟";
+
+"common.deleteConfirmMessage" = "لا يمكن التراجع عن هذا الإجراء.";
+
+"lock.pin.empty" = "لم يتم إدخال رمز PIN";
+"lock.pin.digitsEntered" = "تم إدخال %d من 4 أرقام";
+"lock.pin.hint" = "أدخل رمز PIN المكوّن من 4 أرقام لفتح Moneyz.";
+"lock.pin.blockedCountdown" = "حاول مرة أخرى بعد %d ثوانٍ.";
+"onboarding.paycheckStepper.hint" = "عدّل يوم الشهر الذي تبدأ فيه دورة الراتب.";
+"onboarding.pinToggle.hint" = "فعّل حماية PIN أثناء الإعداد.";
+"onboarding.continue.hint" = "أكمل الإعداد وافتح التطبيق.";
