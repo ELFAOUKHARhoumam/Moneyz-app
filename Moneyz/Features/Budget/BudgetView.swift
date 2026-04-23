@@ -33,13 +33,20 @@ struct BudgetView: View {
 
             List {
                 Section {
-                    Picker(AppLocalizer.string("time.range"), selection: $viewModel.rangeOption) {
-                        ForEach(TimeRangeOption.allCases) { option in
-                            Text(AppLocalizer.string(option.localizedKey)).tag(option)
+                    VStack(alignment: .leading, spacing: 14) {
+                        PremiumTheme.SectionHeaderView(
+                            title: AppLocalizer.string("budget.title"),
+                            subtitle: AppLocalizer.string(viewModel.rangeOption.localizedKey)
+                        )
+
+                        Picker(AppLocalizer.string("time.range"), selection: $viewModel.rangeOption) {
+                            ForEach(TimeRangeOption.allCases) { option in
+                                Text(AppLocalizer.string(option.localizedKey)).tag(option)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .premiumCard(cornerRadius: 24, padding: 8)
                     }
-                    .pickerStyle(.segmented)
-                    .premiumCard(cornerRadius: 24, padding: 8)
                 }
                 .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 10, trailing: 20))
                 .listRowBackground(Color.clear)

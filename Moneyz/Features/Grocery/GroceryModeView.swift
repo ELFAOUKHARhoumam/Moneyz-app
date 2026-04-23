@@ -31,6 +31,8 @@ struct GroceryModeView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
                     if let currentList {
+                        let groupedItems = viewModel.groupedItems(for: currentList)
+
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text(currentList.title)
@@ -80,18 +82,19 @@ struct GroceryModeView: View {
 
                             VStack(spacing: 12) {
                                 TextField(AppLocalizer.string("grocery.itemName"), text: $viewModel.itemName)
-                                    .textFieldStyle(.roundedBorder)
+                                    .premiumFormField()
 
                                 HStack {
                                     TextField(AppLocalizer.string("grocery.group"), text: $viewModel.groupName)
-                                        .textFieldStyle(.roundedBorder)
+                                        .premiumFormField()
 
                                     TextField(AppLocalizer.string("grocery.emoji"), text: $viewModel.emoji)
-                                        .textFieldStyle(.roundedBorder)
+                                        .premiumFormField()
                                         .frame(width: 72)
                                 }
 
                                 Toggle(AppLocalizer.string("grocery.saveReusable"), isOn: $viewModel.saveAsPreset)
+                                    .premiumSecondaryCard(cornerRadius: 18, padding: 14)
 
                                 Button {
                                     viewModel.addCustomItem(to: currentList, in: modelContext)
@@ -109,7 +112,6 @@ struct GroceryModeView: View {
                                 .foregroundStyle(PremiumTheme.Palette.danger)
                         }
 
-                        let groupedItems = viewModel.groupedItems(for: currentList)
                         if groupedItems.isEmpty {
                             EmptyStateView(
                                 systemImage: "cart",
@@ -164,14 +166,14 @@ struct GroceryModeView: View {
                                 .font(.headline)
 
                             TextField(AppLocalizer.string("grocery.itemName"), text: $viewModel.presetName)
-                                .textFieldStyle(.roundedBorder)
+                                .premiumFormField()
 
                             HStack {
                                 TextField(AppLocalizer.string("grocery.group"), text: $viewModel.presetGroupName)
-                                    .textFieldStyle(.roundedBorder)
+                                    .premiumFormField()
 
                                 TextField(AppLocalizer.string("grocery.emoji"), text: $viewModel.presetEmoji)
-                                    .textFieldStyle(.roundedBorder)
+                                    .premiumFormField()
                                     .frame(width: 72)
                             }
 

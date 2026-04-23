@@ -15,6 +15,19 @@ struct SummaryCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            RoundedRectangle(cornerRadius: 999, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            colors.first?.opacity(0.92) ?? PremiumTheme.Palette.accent,
+                            colors.last?.opacity(0.72) ?? PremiumTheme.Palette.accentSecondary
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: 72, height: 6)
+
             HStack(spacing: 12) {
                 PremiumTheme.IconBadge(systemImage: systemImage, colors: colors, size: 44, symbolSize: 16)
 
@@ -40,18 +53,24 @@ struct SummaryCardView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
 
-            RoundedRectangle(cornerRadius: 999, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            colors.first?.opacity(0.24) ?? PremiumTheme.Palette.accent.opacity(0.24),
-                            colors.last?.opacity(0.10) ?? PremiumTheme.Palette.accentSecondary.opacity(0.10)
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(colors.first ?? PremiumTheme.Palette.accent)
+                    .frame(width: 8, height: 8)
+
+                RoundedRectangle(cornerRadius: 999, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                colors.first?.opacity(0.24) ?? PremiumTheme.Palette.accent.opacity(0.24),
+                                colors.last?.opacity(0.10) ?? PremiumTheme.Palette.accentSecondary.opacity(0.10)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
-                )
-                .frame(height: 8)
+                    .frame(height: 8)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .premiumCard(cornerRadius: 24, padding: 18)

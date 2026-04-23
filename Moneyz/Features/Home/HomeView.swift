@@ -66,9 +66,10 @@ struct HomeView: View {
                     showingAddTransaction = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, PremiumTheme.Palette.accent)
+                        .symbolRenderingMode(.hierarchical)
                 }
+                .buttonStyle(.plain)
+                .premiumToolbarButton()
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
@@ -111,12 +112,7 @@ struct HomeView: View {
                     Text(AppLocalizer.string(viewModel.rangeOption.localizedKey))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color.white.opacity(colorScheme == .dark ? 0.08 : 0.55))
-                        )
+                        .premiumCapsule()
                 }
 
                 Spacer(minLength: 12)
@@ -169,15 +165,7 @@ struct HomeView: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: colorScheme == .dark
-                            ? [Color.white.opacity(0.10), Color.white.opacity(0.03)]
-                            : [Color.white, Color(red: 0.97, green: 0.98, blue: 1.0)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(PremiumTheme.Palette.heroFill(for: colorScheme))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 30, style: .continuous)
@@ -192,7 +180,7 @@ struct HomeView: View {
         }
         .overlay(alignment: .bottomLeading) {
             Circle()
-                .fill(PremiumTheme.Palette.info.opacity(colorScheme == .dark ? 0.16 : 0.08))
+                .fill(PremiumTheme.Palette.accentWarm.opacity(colorScheme == .dark ? 0.16 : 0.08))
                 .frame(width: 110, height: 110)
                 .blur(radius: 18)
                 .offset(x: -14, y: 14)

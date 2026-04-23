@@ -28,6 +28,19 @@ struct EmptyStateView: View {
                 .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
                 .multilineTextAlignment(.center)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility4)
+
+            RoundedRectangle(cornerRadius: 999, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            PremiumTheme.Palette.accent.opacity(0.22),
+                            PremiumTheme.Palette.accentWarm.opacity(0.12)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: 88, height: 8)
         }
         .padding(24)
         .frame(maxWidth: .infinity)

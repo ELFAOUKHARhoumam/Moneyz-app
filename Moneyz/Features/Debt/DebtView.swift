@@ -31,13 +31,20 @@ struct DebtView: View {
 
             List {
                 Section {
-                    Picker(AppLocalizer.string("debt.filter"), selection: $viewModel.filter) {
-                        ForEach(DebtViewModel.Filter.allCases) { filter in
-                            Text(AppLocalizer.string(filter.localizedKey)).tag(filter)
+                    VStack(alignment: .leading, spacing: 14) {
+                        PremiumTheme.SectionHeaderView(
+                            title: AppLocalizer.string("debt.title"),
+                            subtitle: "\(AppLocalizer.string("debt.summary.openItems")) \(summary.openCount)"
+                        )
+
+                        Picker(AppLocalizer.string("debt.filter"), selection: $viewModel.filter) {
+                            ForEach(DebtViewModel.Filter.allCases) { filter in
+                                Text(AppLocalizer.string(filter.localizedKey)).tag(filter)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .premiumCard(cornerRadius: 24, padding: 8)
                     }
-                    .pickerStyle(.segmented)
-                    .premiumCard(cornerRadius: 24, padding: 8)
                 }
                 .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 10, trailing: 20))
                 .listRowBackground(Color.clear)
@@ -137,6 +144,8 @@ struct DebtView: View {
                 } label: {
                     Image(systemName: "plus.circle.fill")
                 }
+                .buttonStyle(.plain)
+                .premiumToolbarButton()
             }
         }
         .sheet(isPresented: $viewModel.showingEditor, onDismiss: {

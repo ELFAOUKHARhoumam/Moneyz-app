@@ -5,9 +5,10 @@ import UIKit
 
 enum PremiumTheme {
     enum Palette {
-        static let accent = Color(red: 0.27, green: 0.49, blue: 0.98)
-        static let accentSecondary = Color(red: 0.55, green: 0.42, blue: 0.98)
-        static let info = Color(red: 0.32, green: 0.72, blue: 0.98)
+        static let accent = Color(red: 0.10, green: 0.43, blue: 0.85)
+        static let accentSecondary = Color(red: 0.00, green: 0.68, blue: 0.72)
+        static let accentWarm = Color(red: 0.91, green: 0.69, blue: 0.30)
+        static let info = Color(red: 0.27, green: 0.64, blue: 0.98)
 
         static let success = Color(red: 0.24, green: 0.79, blue: 0.59)
         static let successSoft = Color(red: 0.59, green: 0.92, blue: 0.78)
@@ -19,20 +20,20 @@ enum PremiumTheme {
         static let dangerSoft = Color(red: 1.00, green: 0.72, blue: 0.63)
 
         static let pageTopLight = Color(red: 0.95, green: 0.97, blue: 1.00)
-        static let pageBottomLight = Color(red: 0.99, green: 0.99, blue: 1.00)
-        static let pageTopDark = Color(red: 0.04, green: 0.06, blue: 0.12)
-        static let pageBottomDark = Color(red: 0.08, green: 0.10, blue: 0.18)
+        static let pageBottomLight = Color(red: 0.99, green: 0.98, blue: 0.96)
+        static let pageTopDark = Color(red: 0.03, green: 0.06, blue: 0.10)
+        static let pageBottomDark = Color(red: 0.07, green: 0.11, blue: 0.17)
 
-        static let surfaceLightTop = Color.white.opacity(0.96)
-        static let surfaceLightBottom = Color(red: 0.97, green: 0.98, blue: 1.00).opacity(0.96)
-        static let surfaceDarkTop = Color(red: 0.10, green: 0.13, blue: 0.22).opacity(0.96)
-        static let surfaceDarkBottom = Color(red: 0.07, green: 0.10, blue: 0.18).opacity(0.98)
+        static let surfaceLightTop = Color.white.opacity(0.94)
+        static let surfaceLightBottom = Color(red: 0.95, green: 0.97, blue: 0.99).opacity(0.98)
+        static let surfaceDarkTop = Color(red: 0.09, green: 0.13, blue: 0.19).opacity(0.98)
+        static let surfaceDarkBottom = Color(red: 0.05, green: 0.09, blue: 0.15).opacity(0.99)
 
-        static let outlineLight = Color.black.opacity(0.05)
-        static let outlineDark = Color.white.opacity(0.08)
+        static let outlineLight = Color.black.opacity(0.06)
+        static let outlineDark = Color.white.opacity(0.10)
 
-        static let mutedTextLight = Color.black.opacity(0.62)
-        static let mutedTextDark = Color.white.opacity(0.68)
+        static let mutedTextLight = Color.black.opacity(0.60)
+        static let mutedTextDark = Color.white.opacity(0.70)
 
         static func surfaceFill(for colorScheme: ColorScheme) -> LinearGradient {
             LinearGradient(
@@ -47,8 +48,34 @@ enum PremiumTheme {
         static func elevatedSurfaceFill(for colorScheme: ColorScheme) -> LinearGradient {
             LinearGradient(
                 colors: colorScheme == .dark
-                    ? [Color.white.opacity(0.08), surfaceDarkTop]
-                    : [Color.white, surfaceLightBottom],
+                    ? [Color.white.opacity(0.10), surfaceDarkTop]
+                    : [Color.white, Color(red: 0.97, green: 0.98, blue: 1.00)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        static func inputFill(for colorScheme: ColorScheme) -> LinearGradient {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color.white.opacity(0.08), Color.white.opacity(0.03)]
+                    : [Color.white.opacity(0.95), Color(red: 0.96, green: 0.98, blue: 1.00)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        static func heroFill(for colorScheme: ColorScheme) -> LinearGradient {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [
+                        Color(red: 0.08, green: 0.14, blue: 0.21),
+                        Color(red: 0.05, green: 0.09, blue: 0.16)
+                    ]
+                    : [
+                        Color.white,
+                        Color(red: 0.95, green: 0.98, blue: 1.00)
+                    ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -73,7 +100,11 @@ enum PremiumTheme {
         }
 
         static func shadowColor(for colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? .black.opacity(0.34) : .black.opacity(0.10)
+            colorScheme == .dark ? .black.opacity(0.34) : .black.opacity(0.12)
+        }
+
+        static func softShadowColor(for colorScheme: ColorScheme) -> Color {
+            colorScheme == .dark ? .black.opacity(0.18) : accent.opacity(0.12)
         }
 
         static func metricColors(for titleKey: String, systemImage: String? = nil) -> [Color] {
@@ -101,6 +132,15 @@ enum PremiumTheme {
             ZStack {
                 Palette.pageGradient(for: colorScheme)
 
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(colorScheme == .dark ? 0.03 : 0.30),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+
                 RadialGradient(
                     colors: [
                         Palette.accent.opacity(colorScheme == .dark ? 0.28 : 0.18),
@@ -114,7 +154,7 @@ enum PremiumTheme {
 
                 RadialGradient(
                     colors: [
-                        Palette.accentSecondary.opacity(colorScheme == .dark ? 0.22 : 0.12),
+                        Palette.accentWarm.opacity(colorScheme == .dark ? 0.15 : 0.10),
                         Color.clear
                     ],
                     center: .bottomLeading,
@@ -153,7 +193,25 @@ enum PremiumTheme {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
                 )
+                .overlay(alignment: .topLeading) {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(colorScheme == .dark ? 0.08 : 0.55),
+                                    Color.white.opacity(0.0)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .mask(
+                            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                                .padding(1)
+                        )
+                }
                 .shadow(color: Palette.shadowColor(for: colorScheme), radius: colorScheme == .dark ? 18 : 22, x: 0, y: 12)
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 10, x: 0, y: 2)
         }
     }
 
@@ -174,6 +232,26 @@ enum PremiumTheme {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
                 )
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 8, x: 0, y: 4)
+        }
+    }
+
+    struct InputFieldModifier: ViewModifier {
+        @Environment(\.colorScheme) private var colorScheme
+
+        func body(content: Content) -> some View {
+            content
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Palette.inputFill(for: colorScheme))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
+                )
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 8, x: 0, y: 3)
         }
     }
 
@@ -184,11 +262,50 @@ enum PremiumTheme {
             content
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(.ultraThinMaterial, in: Capsule(style: .continuous))
+                .background(
+                    LinearGradient(
+                        colors: colorScheme == .dark
+                            ? [Color.white.opacity(0.10), Color.white.opacity(0.05)]
+                            : [Color.white.opacity(0.94), Color.white.opacity(0.64)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: Capsule(style: .continuous)
+                )
                 .overlay(
                     Capsule(style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
                 )
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 10, x: 0, y: 4)
+        }
+    }
+
+    struct ToolbarIconModifier: ViewModifier {
+        @Environment(\.colorScheme) private var colorScheme
+
+        let accent: Color
+
+        func body(content: Content) -> some View {
+            content
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(colorScheme == .dark ? .white : accent)
+                .frame(width: 38, height: 38)
+                .background(
+                    Circle()
+                        .fill(
+                            colorScheme == .dark
+                                ? Color.white.opacity(0.10)
+                                : Color.white.opacity(0.82)
+                        )
+                )
+                .overlay(
+                    Circle()
+                        .strokeBorder(
+                            colorScheme == .dark ? Color.white.opacity(0.08) : accent.opacity(0.12),
+                            lineWidth: 1
+                        )
+                )
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 10, x: 0, y: 4)
         }
     }
 
@@ -271,9 +388,9 @@ enum PremiumTheme {
 
     #if canImport(UIKit)
     static func configureUIKitAppearance() {
-        let accent = UIColor(red: 0.27, green: 0.49, blue: 0.98, alpha: 1.0)
-        let secondaryAccent = UIColor(red: 0.55, green: 0.42, blue: 0.98, alpha: 1.0)
-        let tabBarBackground = UIColor.systemBackground.withAlphaComponent(0.78)
+        let accent = UIColor(red: 0.10, green: 0.43, blue: 0.85, alpha: 1.0)
+        let secondaryAccent = UIColor(red: 0.00, green: 0.68, blue: 0.72, alpha: 1.0)
+        let tabBarBackground = UIColor.systemBackground.withAlphaComponent(0.72)
 
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithTransparentBackground()
@@ -298,6 +415,7 @@ enum PremiumTheme {
                 .font: UIFont.systemFont(ofSize: 10, weight: .medium)
             ]
         }
+        tabBarAppearance.shadowColor = UIColor.separator.withAlphaComponent(0.08)
 
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
@@ -306,8 +424,14 @@ enum PremiumTheme {
         navAppearance.configureWithTransparentBackground()
         navAppearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
         navAppearance.backgroundColor = .clear
-        navAppearance.titleTextAttributes = [.foregroundColor: UIColor.label]
-        navAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+        navAppearance.titleTextAttributes = [
+            .foregroundColor: UIColor.label,
+            .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+        ]
+        navAppearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.label,
+            .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+        ]
         UINavigationBar.appearance().standardAppearance = navAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
         UINavigationBar.appearance().compactAppearance = navAppearance
@@ -349,8 +473,16 @@ extension View {
         modifier(PremiumTheme.SecondaryCardModifier(cornerRadius: cornerRadius, contentPadding: padding))
     }
 
+    func premiumFormField() -> some View {
+        modifier(PremiumTheme.InputFieldModifier())
+    }
+
     func premiumCapsule() -> some View {
         modifier(PremiumTheme.GlassCapsuleModifier())
+    }
+
+    func premiumToolbarButton(accent: Color = PremiumTheme.Palette.accent) -> some View {
+        modifier(PremiumTheme.ToolbarIconModifier(accent: accent))
     }
 
     func premiumPrimaryButton() -> some View {

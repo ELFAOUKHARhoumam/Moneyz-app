@@ -66,9 +66,16 @@ struct TransactionRowView: View {
                     .monospacedDigit()
                     .foregroundStyle(transaction.kind == .expense ? .primary : PremiumTheme.Palette.success)
 
-                Text(AppLocalizer.string(transaction.kind.localizedKey))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(colors.first ?? PremiumTheme.Palette.accent)
+                        .frame(width: 6, height: 6)
+
+                    Text(AppLocalizer.string(transaction.kind.localizedKey))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(

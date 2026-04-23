@@ -56,6 +56,8 @@ struct SettingsView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
+                    settingsOverviewCard
+
                     sectionCard(titleKey: "settings.profile") {
                         VStack(spacing: 14) {
                             inputField(
@@ -239,7 +241,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle(Text(AppLocalizer.string("settings.title")))
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(.hidden, for: .navigationBar)
         .sheet(isPresented: $showingPINSetup) {
             PINSetupSheet(mode: settings.usePINLock ? .change : .create) { pin in
@@ -265,6 +267,34 @@ struct SettingsView: View {
         .premiumCard(cornerRadius: 28, padding: 18)
     }
 
+    private var settingsOverviewCard: some View {
+        HStack(spacing: 14) {
+            PremiumTheme.IconBadge(
+                systemImage: "person.crop.circle.fill",
+                colors: [PremiumTheme.Palette.accent, PremiumTheme.Palette.accentSecondary],
+                size: 52,
+                symbolSize: 20
+            )
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(settings.displayName.isEmpty ? AppLocalizer.string("settings.title") : settings.displayName)
+                    .font(.headline.weight(.bold))
+
+                Text(selectedCurrencyName)
+                    .font(.subheadline)
+                    .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
+            }
+
+            Spacer()
+
+            Text(AppLocalizer.string(settings.themePreference.localizedKey))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .premiumCapsule()
+        }
+        .premiumCard(cornerRadius: 28, padding: 18)
+    }
+
     private func inputField(
         title: String,
         text: Binding<String>,
@@ -279,16 +309,7 @@ struct SettingsView: View {
             TextField(placeholder, text: text)
                 .keyboardType(keyboardType)
                 .textInputAutocapitalization(.words)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
-                )
+                .premiumFormField()
         }
     }
 
@@ -312,16 +333,7 @@ struct SettingsView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
-                )
+                .premiumFormField()
             }
             .buttonStyle(.plain)
         }

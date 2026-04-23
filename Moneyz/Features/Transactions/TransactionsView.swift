@@ -25,24 +25,31 @@ struct TransactionsView: View {
 
             List {
                 Section {
-                    Picker(AppLocalizer.string("transactions.filter"), selection: $viewModel.filter) {
-                        ForEach(TransactionsViewModel.Filter.allCases) { filter in
-                            Text(AppLocalizer.string(filter.localizedKey)).tag(filter)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .premiumCard(cornerRadius: 24, padding: 8)
+                    VStack(alignment: .leading, spacing: 14) {
+                        PremiumTheme.SectionHeaderView(
+                            title: AppLocalizer.string("transactions.title"),
+                            subtitle: AppLocalizer.string(viewModel.activeFilterSummaryKey)
+                        )
 
-                    HStack {
-                        Text(AppLocalizer.string(viewModel.activeFilterSummaryKey))
-                            .font(.footnote.weight(.medium))
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("\(filteredTransactions.count)")
-                            .font(.footnote.weight(.bold))
-                            .monospacedDigit()
+                        Picker(AppLocalizer.string("transactions.filter"), selection: $viewModel.filter) {
+                            ForEach(TransactionsViewModel.Filter.allCases) { filter in
+                                Text(AppLocalizer.string(filter.localizedKey)).tag(filter)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .premiumCard(cornerRadius: 24, padding: 8)
+
+                        HStack {
+                            Text(AppLocalizer.string(viewModel.activeFilterSummaryKey))
+                                .font(.footnote.weight(.medium))
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Text("\(filteredTransactions.count)")
+                                .font(.footnote.weight(.bold))
+                                .monospacedDigit()
+                        }
+                        .premiumSecondaryCard(cornerRadius: 20, padding: 14)
                     }
-                    .padding(.horizontal, 4)
                 }
                 .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
                 .listRowBackground(Color.clear)
@@ -98,18 +105,24 @@ struct TransactionsView: View {
                 } label: {
                     Image(systemName: "cart.fill")
                 }
+                .buttonStyle(.plain)
+                .premiumToolbarButton(accent: PremiumTheme.Palette.warning)
 
                 Button {
                     viewModel.showingCategoryManager = true
                 } label: {
                     Image(systemName: "square.grid.2x2")
                 }
+                .buttonStyle(.plain)
+                .premiumToolbarButton(accent: PremiumTheme.Palette.info)
 
                 Button {
                     viewModel.showingAddSheet = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
                 }
+                .buttonStyle(.plain)
+                .premiumToolbarButton()
             }
         }
         .sheet(isPresented: $viewModel.showingAddSheet) {

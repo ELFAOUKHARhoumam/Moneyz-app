@@ -45,16 +45,7 @@ struct OnboardingView: View {
 
                                 TextField(AppLocalizer.string("settings.name"), text: $displayName)
                                     .textInputAutocapitalization(.words)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 14)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                            .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                            .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
-                                    )
+                                    .premiumFormField()
                                     .accessibilityLabel(Text(AppLocalizer.string("onboarding.name")))
                             }
 
@@ -69,16 +60,7 @@ struct OnboardingView: View {
                                 }
                                 .pickerStyle(.menu)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 14)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                        .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                        .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
-                                )
+                                .premiumFormField()
                                 .accessibilityLabel(Text(AppLocalizer.string("onboarding.currency")))
                                 .accessibilityValue(Text(CurrencyCatalog.supported.first(where: { $0.code == currencyCode })?.displayName(locale: settings.locale) ?? currencyCode))
                             }
@@ -94,16 +76,7 @@ struct OnboardingView: View {
                                     Stepper("", value: $salaryCycleStartDay, in: 1...28)
                                         .labelsHidden()
                                 }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 14)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                        .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                        .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
-                                )
+                                .premiumFormField()
                                 .accessibilityElement(children: .combine)
                                 .accessibilityLabel(Text(AppLocalizer.string("onboarding.paycheckDay")))
                                 .accessibilityValue(Text("\(salaryCycleStartDay)"))
