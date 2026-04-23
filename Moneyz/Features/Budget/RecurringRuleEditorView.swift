@@ -13,36 +13,11 @@ struct RecurringRuleEditorView: View {
     @Query(sort: [SortDescriptor<PersonProfile>(\.createdAt)])
     private var people: [PersonProfile]
 
-    private let existingRule: RecurringTransactionRule?
-    private let repository = RecurringRuleRepository()
-
-    @State private var title: String
-    @State private var amountText: String
-    @State private var kind: TransactionKind
-    @State private var frequency: RecurringFrequency
-    @State private var nextRunDate: Date
-    @State private var note: String
-    @State private var selectedCategoryID: UUID?
-    @State private var selectedItemID: UUID?
-    @State private var selectedPersonID: UUID?
-    @State private var errorMessage: String?
+    @StateObject private var viewModel: RecurringRuleEditorViewModel
     @State private var showingDeleteConfirmation = false
 
     init(rule: RecurringTransactionRule?) {
-        existingRule = rule
-        _title = State(initialValue: rule?.title ?? "")
-        _amountText = State(initialValue: CurrencyFormatter.decimalString(from: rule?.amountMinor ?? 0))
-        _kind = State(initialValue: rule?.kind ?? .expense)
-        _frequency = State(initialValue: rule?.frequency ?? .monthly)
-        _nextRunDate = State(initialValue: rule?.nextRunDate ?? .now)
-        _note = State(initialValue: rule?.note ?? "")
-        _selectedCategoryID = State(initialValue: rule?.category?.id)
-        _selectedItemID = State(initialValue: rule?.item?.id)
-        _selectedPersonID = State(initialValue: rule?.person?.id)
-    }
-
-    private var titleKey: String {
-        existingRule == nil ? "budget.fixed.add" : "budget.fixed.edit"
+        _viewModel = StateObject(wrappedValue: RecurringRuleEditorViewModel(rule: rule))
     }
 
     private var availableCategories: [TransactionCategory] {
@@ -51,15 +26,15 @@ struct RecurringRuleEditorView: View {
             .filter {
                 switch $0.kind {
                 case .both: return true
-                case .expense: return kind == .expense
-                case .income: return kind == .income
+                case .expense: return viewModel.kind == .expense
+                case .income: return viewModel.kind == .income
                 }
             }
             .sorted { $0.sortOrder < $1.sortOrder }
     }
 
     private var selectedCategory: TransactionCategory? {
-        availableCategories.first(where: { $0.id == selectedCategoryID })
+        availableCategories.first(where: { $0.id == viewModel.selectedCategoryID })
     }
 
     var body: some View {
@@ -69,31 +44,31 @@ struct RecurringRuleEditorView: View {
 
             Form {
                 Section(AppLocalizer.string("budget.fixed.details")) {
-                    TextField(AppLocalizer.string("budget.fixed.title"), text: $title)
-                    TextField(AppLocalizer.string("budget.fixed.amount"), text: $amountText)
+                    TextField(AppLocalizer.string("budget.fixed.title"), text: $viewModel.title)
+                    TextField(AppLocalizer.string("budget.fixed.amount"), text: $viewModel.amountText)
                         .keyboardType(.decimalPad)
 
-                    Picker(AppLocalizer.string("transactions.type"), selection: $kind) {
+                    Picker(AppLocalizer.string("transactions.type"), selection: $viewModel.kind) {
                         ForEach(TransactionKind.allCases) { option in
                             Text(AppLocalizer.string(option.localizedKey)).tag(option)
                         }
                     }
                     .pickerStyle(.segmented)
 
-                    Picker(AppLocalizer.string("budget.fixed.frequency"), selection: $frequency) {
+                    Picker(AppLocalizer.string("budget.fixed.frequency"), selection: $viewModel.frequency) {
                         ForEach(RecurringFrequency.allCases) { option in
                             Text(AppLocalizer.string(option.localizedKey)).tag(option)
                         }
                     }
 
-                    DatePicker(AppLocalizer.string("budget.fixed.nextDate"), selection: $nextRunDate, displayedComponents: .date)
+                    DatePicker(AppLocalizer.string("budget.fixed.nextDate"), selection: $viewModel.nextRunDate, displayedComponents: .date)
 
-                    TextField(AppLocalizer.string("transactions.note"), text: $note, axis: .vertical)
+                    TextField(AppLocalizer.string("transactions.note"), text: $viewModel.note, axis: .vertical)
                         .lineLimit(3, reservesSpace: true)
                 }
 
                 Section(AppLocalizer.string("transactions.categorySection")) {
-                    Picker(AppLocalizer.string("transactions.category"), selection: $selectedCategoryID) {
+                    Picker(AppLocalizer.string("transactions.category"), selection: $viewModel.selectedCategoryID) {
                         Text(AppLocalizer.string("common.none")).tag(Optional<UUID>.none)
                         ForEach(availableCategories, id: \.id) { category in
                             Text("\(category.emoji) \(category.name)").tag(Optional(category.id))
@@ -101,7 +76,7 @@ struct RecurringRuleEditorView: View {
                     }
 
                     if let selectedCategory {
-                        Picker(AppLocalizer.string("transactions.item"), selection: $selectedItemID) {
+                        Picker(AppLocalizer.string("transactions.item"), selection: $viewModel.selectedItemID) {
                             Text(AppLocalizer.string("common.none")).tag(Optional<UUID>.none)
                             ForEach(selectedCategory.items.filter { !$0.isArchived }.sorted { $0.sortOrder < $1.sortOrder }, id: \.id) { item in
                                 Text([item.groupName, item.name].compactMap { $0 }.joined(separator: " • ")).tag(Optional(item.id))
@@ -109,7 +84,7 @@ struct RecurringRuleEditorView: View {
                         }
                     }
 
-                    Picker(AppLocalizer.string("transactions.person"), selection: $selectedPersonID) {
+                    Picker(AppLocalizer.string("transactions.person"), selection: $viewModel.selectedPersonID) {
                         Text(AppLocalizer.string("common.none")).tag(Optional<UUID>.none)
                         ForEach(people.filter { !$0.isArchived }, id: \.id) { person in
                             Text("\(person.emoji) \(person.name)").tag(Optional(person.id))
@@ -117,7 +92,7 @@ struct RecurringRuleEditorView: View {
                     }
                 }
 
-                if let errorMessage {
+                if let errorMessage = viewModel.errorMessage {
                     Section {
                         Text(errorMessage)
                             .foregroundStyle(PremiumTheme.Palette.danger)
@@ -128,7 +103,7 @@ struct RecurringRuleEditorView: View {
             }
             .scrollContentBackground(.hidden)
         }
-        .navigationTitle(Text(AppLocalizer.string(titleKey)))
+        .navigationTitle(Text(AppLocalizer.string(viewModel.titleKey)))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
@@ -140,11 +115,18 @@ struct RecurringRuleEditorView: View {
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button(AppLocalizer.string("common.save")) {
-                    save()
+                    if viewModel.save(
+                        categories: availableCategories,
+                        people: people.filter { !$0.isArchived },
+                        locale: settings.locale,
+                        in: modelContext
+                    ) {
+                        dismiss()
+                    }
                 }
             }
 
-            if existingRule != nil {
+            if viewModel.existingRule != nil {
                 ToolbarItem(placement: .bottomBar) {
                     Button(role: .destructive) {
                         showingDeleteConfirmation = true
@@ -160,69 +142,30 @@ struct RecurringRuleEditorView: View {
             titleVisibility: .visible
         ) {
             Button(AppLocalizer.string("common.delete"), role: .destructive) {
-                deleteRule()
+                if viewModel.delete(in: modelContext) {
+                    dismiss()
+                }
             }
 
             Button(AppLocalizer.string("common.cancel"), role: .cancel) { }
         } message: {
             Text(AppLocalizer.string("common.deleteConfirmMessage"))
         }
-        .onChange(of: kind) { _, _ in
-            if !availableCategories.contains(where: { $0.id == selectedCategoryID }) {
-                selectedCategoryID = nil
-                selectedItemID = nil
+        .onChange(of: viewModel.kind) { _, _ in
+            if !availableCategories.contains(where: { $0.id == viewModel.selectedCategoryID }) {
+                viewModel.selectedCategoryID = nil
+                viewModel.selectedItemID = nil
             }
         }
-        .onChange(of: selectedCategoryID) { _, newValue in
+        .onChange(of: viewModel.selectedCategoryID) { _, newValue in
             guard let selectedCategory, selectedCategory.id == newValue else {
-                selectedItemID = nil
+                viewModel.selectedItemID = nil
                 return
             }
 
-            if !selectedCategory.items.contains(where: { $0.id == selectedItemID }) {
-                selectedItemID = nil
+            if !selectedCategory.items.contains(where: { $0.id == viewModel.selectedItemID }) {
+                viewModel.selectedItemID = nil
             }
-        }
-    }
-
-    private func save() {
-        guard let amountMinor = CurrencyFormatter.minorUnits(from: amountText, locale: settings.locale), amountMinor > 0 else {
-            errorMessage = AppLocalizer.string("validation.amount")
-            return
-        }
-
-        let selectedCategory = availableCategories.first(where: { $0.id == selectedCategoryID })
-        let selectedItem = selectedCategory?.items.first(where: { $0.id == selectedItemID })
-        let selectedPerson = people.first(where: { $0.id == selectedPersonID })
-
-        let draft = RecurringRuleDraft(
-            title: title,
-            amountMinor: amountMinor,
-            kind: kind,
-            frequency: frequency,
-            nextRunDate: Calendar.current.startOfDay(for: nextRunDate),
-            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
-            category: selectedCategory,
-            item: selectedItem,
-            person: selectedPerson
-        )
-
-        do {
-            try repository.upsert(existing: existingRule, draft: draft, in: modelContext)
-            dismiss()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    private func deleteRule() {
-        guard let existingRule else { return }
-
-        do {
-            try repository.delete(existingRule, in: modelContext)
-            dismiss()
-        } catch {
-            errorMessage = error.localizedDescription
         }
     }
 }

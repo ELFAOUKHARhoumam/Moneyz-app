@@ -112,8 +112,13 @@ struct PINSetupSheet: View {
     }
 
     private func savePIN() {
-        guard pin.count == 4, confirmPIN.count == 4 else {
-            errorMessage = AppLocalizer.string("pin.validation.length")
+        if let violation = PINSecurity.validateNewPIN(pin) {
+            errorMessage = AppLocalizer.string(violation.localizedKey)
+            return
+        }
+
+        guard confirmPIN.count == 4 else {
+            errorMessage = AppLocalizer.string(PINPolicyViolation.invalidLength.localizedKey)
             return
         }
 

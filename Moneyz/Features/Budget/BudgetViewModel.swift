@@ -9,6 +9,7 @@ final class BudgetViewModel: ObservableObject {
     @Published var showingRuleEditor = false
     @Published var editingPerson: PersonProfile?
     @Published var editingRule: RecurringTransactionRule?
+    @Published var pendingDeletionRule: RecurringTransactionRule?
     @Published var errorMessage: String?
 
     private let insightsService = BudgetInsightsService()
@@ -59,5 +60,19 @@ final class BudgetViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func requestDelete(_ rule: RecurringTransactionRule) {
+        pendingDeletionRule = rule
+    }
+
+    func confirmDelete(in context: ModelContext) {
+        guard let rule = pendingDeletionRule else { return }
+        delete(rule, in: context)
+        pendingDeletionRule = nil
+    }
+
+    func cancelPendingDelete() {
+        pendingDeletionRule = nil
     }
 }

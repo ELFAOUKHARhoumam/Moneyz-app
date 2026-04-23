@@ -16,8 +16,12 @@ final class AddEditTransactionViewModel: ObservableObject {
 
     let existingTransaction: MoneyTransaction?
     private let repository = TransactionRepository()
+    private let deleteTransactionAction: @MainActor (MoneyTransaction, ModelContext) throws -> Void
 
-    init(transaction: MoneyTransaction?) {
+    init(
+        transaction: MoneyTransaction?,
+        deleteTransactionAction: (@MainActor (MoneyTransaction, ModelContext) throws -> Void)? = nil
+    ) {
         existingTransaction = transaction
         amountText = CurrencyFormatter.decimalString(from: transaction?.amountMinor ?? 0)
         kind = transaction?.kind ?? .expense
@@ -27,6 +31,9 @@ final class AddEditTransactionViewModel: ObservableObject {
         selectedCategoryID = transaction?.category?.id
         selectedItemID = transaction?.item?.id
         selectedPersonID = transaction?.person?.id
+        self.deleteTransactionAction = deleteTransactionAction ?? { existingTransaction, context in
+            try TransactionRepository().delete(existingTransaction, in: context)
+        }
     }
 
     var titleKey: String {
@@ -61,6 +68,19 @@ final class AddEditTransactionViewModel: ObservableObject {
 
         do {
             try repository.upsert(existing: existingTransaction, draft: draft, in: context)
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func delete(in context: ModelContext) -> Bool {
+        guard let existingTransaction else { return false }
+
+        do {
+            try deleteTransactionAction(existingTransaction, context)
+            errorMessage = nil
             return true
         } catch {
             errorMessage = error.localizedDescription

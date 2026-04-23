@@ -10,6 +10,13 @@
 "home.recentTransactions" = "أحدث المعاملات";
 "home.empty.title" = "لا توجد معاملات بعد";
 "home.empty.message" = "ابدأ بإضافة عملية واحدة وسيبني Moneyz خطك اليومي تلقائيًا.";
+"home.savings.title" = "المدخرات";
+"home.savings.positive" = "لقد بقيت في وضع جيد خلال هذه الفترة.";
+"home.savings.negative" = "الإنفاق أعلى من الدخل خلال هذه الفترة.";
+"home.activity.title" = "نبض الإنفاق";
+"home.activity.count" = "عمليات ضمن النطاق";
+"home.burnRate" = "معدل الحرق";
+"home.burnRate.footer" = "يوضح مقدار ما تم إنفاقه بالفعل من دخل الفترة الحالية.";
 
 "dashboard.balance" = "الرصيد";
 "dashboard.income" = "الدخل";
@@ -21,6 +28,10 @@
 "transactions.filter" = "التصفية";
 "transactions.empty.title" = "لا يوجد شيء لعرضه";
 "transactions.empty.message" = "أضف دخلًا أو مصروفًا لبدء التتبع.";
+"transactions.summary.all" = "عرض جميع المعاملات";
+"transactions.summary.searching" = "تمت التصفية حسب بحثك";
+"transactions.summary.expense" = "عرض المصروفات فقط";
+"transactions.summary.income" = "عرض الدخل فقط";
 "transactions.add" = "إضافة معاملة";
 "transactions.edit" = "تعديل المعاملة";
 "transactions.fallbackTitle" = "معاملة";
@@ -74,6 +85,12 @@
 "budget.fixed.footer" = "يمكن أن تكون العناصر المتكررة دخلًا أو مصروفًا. تُنشأ العناصر المستحقة معاملات تلقائيًا، ويمكنك الضغط على أي صف لتعديله أو حذفه.";
 "budget.fixed.empty.title" = "لا توجد عناصر متكررة";
 "budget.fixed.empty.message" = "أضف قواعد متكررة للإيجار والاشتراكات والقروض والراتب.";
+"budget.fixed.saved" = "تم حفظ القاعدة المتكررة.";
+"budget.fixed.appliedCount" = "تم حفظ القاعدة المتكررة وتطبيق %d معاملة مستحقة.";
+"budget.status.notStarted" = "لم يتم تسجيل أي إنفاق بعد.";
+"budget.status.onTrack" = "أنت ضمن الميزانية لهذه الفترة.";
+"budget.status.warning" = "أنت قريب من حد الميزانية.";
+"budget.status.exceeded" = "تم الوصول إلى حد الميزانية.";
 
 "debt.title" = "الديون";
 "debt.filter" = "التصفية";
@@ -90,6 +107,8 @@
 "debt.empty.title" = "لا توجد ديون";
 "debt.empty.message" = "تابع ما عليك وما لك في مكان واحد.";
 "debt.summary.openItems" = "العناصر المفتوحة:";
+"debt.summary.overdue" = "متأخر";
+"debt.summary.dueSoon" = "يستحق قريبًا";
 "debt.direction.iOwe" = "عليّ";
 "debt.direction.owedToMe" = "لي عند الغير";
 
@@ -191,8 +210,8 @@
 "onboarding.currency" = "اختر العملة الأساسية";
 "onboarding.paycheckDay" = "متى يكون يوم استلام الراتب؟";
 "onboarding.paycheckValue" = "يوم الراتب:";
-"onboarding.enablePIN" = "حماية التطبيق برمز PIN مكوّن من 4 أرقام";
-"onboarding.pinRequired" = "اضبط رمز PIN من 4 أرقام قبل المتابعة.";
+"onboarding.enablePIN" = "حماية التطبيق برمز PIN آمن مكوّن من 4 أرقام";
+"onboarding.pinRequired" = "اضبط رمز PIN آمنًا مكوّنًا من 4 أرقام قبل المتابعة.";
 "onboarding.continue" = "متابعة";
 
 "lock.title" = "فتح Moneyz";
@@ -205,13 +224,16 @@
 "pin.code" = "رمز PIN من 4 أرقام";
 "pin.new" = "رمز سري جديد من 4 أرقام";
 "pin.confirm" = "تأكيد الرمز السري";
-"pin.footer" = "استخدم رمزًا سريًا بسيطًا من 4 أرقام للوصول السريع. يمكنك تغييره أو إزالته لاحقًا من الإعدادات.";
+"pin.footer" = "استخدم رمزًا سريًا من 4 أرقام للوصول السريع، لكن تجنّب الأرقام المتكررة أو المتسلسلة. يمكنك تغييره أو إزالته لاحقًا من الإعدادات.";
 "pin.setupNow" = "إعداد الرمز السري الآن";
 "pin.action.save" = "حفظ الرمز";
 "pin.action.update" = "تحديث الرمز";
 "pin.validation.length" = "أدخل رمزًا سريًا صالحًا من 4 أرقام.";
+"pin.validation.weakRepeated" = "اختر رمز PIN لا يستخدم نفس الرقم أربع مرات.";
+"pin.validation.weakSequence" = "اختر رمز PIN ليس تسلسلًا تصاعديًا أو تنازليًا واضحًا.";
 "pin.validation.match" = "الرمزان السريان غير متطابقين.";
 "pin.validation.invalid" = "الرمز السري الذي أدخلته غير صحيح.";
+"pin.retryDelay" = "تم إدخال رمز PIN بشكل خاطئ عدة مرات. يرجى الانتظار ثم المحاولة مرة أخرى.";
 "pin.saveFailed" = "تعذّر حفظ رمز PIN الآن. حاول مرة أخرى.";
 
 "dashboard.overview" = "نظرة عامة";
@@ -226,6 +248,10 @@
 
 "common.deleteConfirmMessage" = "لا يمكن التراجع عن هذا الإجراء.";
 
+"common.archiveConfirmTitle" = "أرشفة هذا العنصر؟";
+
+"common.archiveConfirmMessage" = "يمكنك الاستمرار في استخدام Moneyz، لكن هذا العنصر المؤرشف سيُخفى من القوائم النشطة.";
+
 "lock.pin.empty" = "لم يتم إدخال رمز PIN";
 "lock.pin.digitsEntered" = "تم إدخال %d من 4 أرقام";
 "lock.pin.hint" = "أدخل رمز PIN المكوّن من 4 أرقام لفتح Moneyz.";
@@ -233,3 +259,15 @@
 "onboarding.paycheckStepper.hint" = "عدّل يوم الشهر الذي تبدأ فيه دورة الراتب.";
 "onboarding.pinToggle.hint" = "فعّل حماية PIN أثناء الإعداد.";
 "onboarding.continue.hint" = "أكمل الإعداد وافتح التطبيق.";
+
+"persistence.failed.title" = "تعذّر على Moneyz فتح بياناتك";
+"persistence.failed.retry" = "إعادة المحاولة";
+"persistence.failed.cloudKitConfiguration" = "إعداد مزامنة iCloud غير صحيح في هذه النسخة. تحقّق من إعدادات CloudKit والحاوية.";
+"persistence.failed.cloudKitRuntime" = "تعذّر على Moneyz تهيئة التخزين المرتبط بـ CloudKit.";
+"persistence.failed.localStoreCorrupted" = "اكتشف Moneyz تلفًا في مخزن البيانات المحلي.";
+"persistence.failed.localStoreUnavailable" = "تعذّر على Moneyz فتح مخزن البيانات المحلي.";
+"persistence.failed.migrationFailure" = "تعذّر على Moneyz ترحيل بياناتك الحالية إلى أحدث إصدار.";
+"persistence.failed.unknown" = "تعذّر على Moneyz تهيئة التخزين الدائم.";
+"persistence.details.title" = "تفاصيل تقنية";
+"persistence.banner.localOnly" = "يعمل Moneyz محليًا فقط لأن التخزين المرتبط بـ iCloud تعذّر تشغيله.";
+"persistence.banner.inMemory" = "يعمل Moneyz في وضع ذاكرة مؤقتة. لن يتم حفظ التغييرات بعد إغلاق التطبيق.";

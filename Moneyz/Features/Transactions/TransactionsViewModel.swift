@@ -25,6 +25,7 @@ final class TransactionsViewModel: ObservableObject {
     @Published var showingCategoryManager = false
     @Published var showingGrocery = false
     @Published var editingTransaction: MoneyTransaction?
+    @Published var pendingDeletionTransaction: MoneyTransaction?
     @Published var errorMessage: String?
 
     private let deleteTransactionAction: @MainActor (MoneyTransaction, ModelContext) throws -> Void
@@ -81,5 +82,19 @@ final class TransactionsViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func requestDelete(_ transaction: MoneyTransaction) {
+        pendingDeletionTransaction = transaction
+    }
+
+    func confirmDelete(in context: ModelContext) {
+        guard let transaction = pendingDeletionTransaction else { return }
+        delete(transaction, in: context)
+        pendingDeletionTransaction = nil
+    }
+
+    func cancelPendingDelete() {
+        pendingDeletionTransaction = nil
     }
 }

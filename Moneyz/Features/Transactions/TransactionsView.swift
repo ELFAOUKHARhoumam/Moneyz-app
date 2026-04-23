@@ -66,7 +66,7 @@ struct TransactionsView: View {
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
-                                    viewModel.delete(transaction, in: modelContext)
+                                    viewModel.requestDelete(transaction)
                                 } label: {
                                     Label(AppLocalizer.string("common.delete"), systemImage: "trash")
                                 }
@@ -151,6 +151,23 @@ struct TransactionsView: View {
                     AddEditTransactionView(transaction: transaction)
                 }
             }
+        }
+        .confirmationDialog(
+            AppLocalizer.string("common.deleteConfirmTitle"),
+            isPresented: Binding(
+                get: { viewModel.pendingDeletionTransaction != nil },
+                set: { if !$0 { viewModel.cancelPendingDelete() } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(AppLocalizer.string("common.delete"), role: .destructive) {
+                viewModel.confirmDelete(in: modelContext)
+            }
+            Button(AppLocalizer.string("common.cancel"), role: .cancel) {
+                viewModel.cancelPendingDelete()
+            }
+        } message: {
+            Text(AppLocalizer.string("common.deleteConfirmMessage"))
         }
     }
 }

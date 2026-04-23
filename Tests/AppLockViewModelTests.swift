@@ -21,7 +21,7 @@ final class AppLockViewModelTests: XCTestCase {
     func testThreeInvalidPINAttemptsTriggerRetryBlock() {
         let settings = SettingsStore(defaults: defaults)
         settings.usePINLock = true
-        XCTAssertTrue(PINSecurity.save(pin: "1234"))
+        XCTAssertTrue(PINSecurity.save(pin: "2486"))
 
         let viewModel = AppLockViewModel(authService: StubBiometricAuthService())
         viewModel.prepareIfNeeded(settings: settings)
@@ -37,11 +37,11 @@ final class AppLockViewModelTests: XCTestCase {
     func testSuccessfulPINUnlockClearsLockState() {
         let settings = SettingsStore(defaults: defaults)
         settings.usePINLock = true
-        XCTAssertTrue(PINSecurity.save(pin: "1234"))
+        XCTAssertTrue(PINSecurity.save(pin: "2486"))
 
         let viewModel = AppLockViewModel(authService: StubBiometricAuthService())
         viewModel.prepareIfNeeded(settings: settings)
-        viewModel.unlock(withPIN: "1234", settings: settings)
+        viewModel.unlock(withPIN: "2486", settings: settings)
 
         XCTAssertFalse(viewModel.isLocked)
         XCTAssertFalse(viewModel.isPINEntryTemporarilyBlocked)
@@ -66,7 +66,7 @@ final class AppLockViewModelTests: XCTestCase {
     func testHandleScenePhaseClearsRetryStateWhenLockNotRequired() {
         let settings = SettingsStore(defaults: defaults)
         settings.usePINLock = true
-        XCTAssertTrue(PINSecurity.save(pin: "1234"))
+        XCTAssertTrue(PINSecurity.save(pin: "2486"))
 
         let viewModel = AppLockViewModel(authService: StubBiometricAuthService())
         viewModel.prepareIfNeeded(settings: settings)

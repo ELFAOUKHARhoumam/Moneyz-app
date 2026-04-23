@@ -88,7 +88,7 @@ struct BudgetView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
-                                        viewModel.delete(rule, in: modelContext)
+                                        viewModel.requestDelete(rule)
                                     } label: {
                                         Label(AppLocalizer.string("common.delete"), systemImage: "trash")
                                     }
@@ -150,6 +150,23 @@ struct BudgetView: View {
                 Text(viewModel.errorMessage ?? "")
             }
         )
+        .confirmationDialog(
+            AppLocalizer.string("common.deleteConfirmTitle"),
+            isPresented: Binding(
+                get: { viewModel.pendingDeletionRule != nil },
+                set: { if !$0 { viewModel.cancelPendingDelete() } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(AppLocalizer.string("common.delete"), role: .destructive) {
+                viewModel.confirmDelete(in: modelContext)
+            }
+            Button(AppLocalizer.string("common.cancel"), role: .cancel) {
+                viewModel.cancelPendingDelete()
+            }
+        } message: {
+            Text(AppLocalizer.string("common.deleteConfirmMessage"))
+        }
     }
 
     private func headerRow(title: String, actionTitle: String, action: @escaping () -> Void) -> some View {

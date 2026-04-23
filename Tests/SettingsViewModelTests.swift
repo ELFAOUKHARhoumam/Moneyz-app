@@ -1,4 +1,5 @@
 import CloudKit
+import SwiftData
 import XCTest
 @testable import Moneyz
 
@@ -43,6 +44,52 @@ final class SettingsViewModelTests: XCTestCase {
         )
 
         XCTAssertFalse(viewModel.biometricsAvailable)
+    }
+
+    func testApplyRecurringUsesInjectedActionAndStoresSuccessFeedback() {
+        let context = ModelContext(PersistenceController.previewContainer())
+        let viewModel = SettingsViewModel(
+            cloudService: CloudSyncStatusService(
+                accountStatusChecker: StubCloudChecker(status: .available, error: nil),
+                readinessProvider: {
+                    CloudKitReadiness(
+                        hasUbiquityContainerIdentifier: true,
+                        hasICloudServices: true,
+                        hasCloudKitContainerEnvironment: true
+                    )
+                }
+            ),
+            authService: StubBiometricAuthService(canAuthenticateValue: true),
+            applyRecurringAction: { _ in 3 }
+        )
+
+        viewModel.applyRecurring(in: context)
+
+        XCTAssertEqual(viewModel.recurringApplyFeedback, .success(appliedCount: 3))
+    }
+
+    func testApplyRecurringStoresFailureFeedbackWhenInjectedActionFails() {
+        let context = ModelContext(PersistenceController.previewContainer())
+        let viewModel = SettingsViewModel(
+            cloudService: CloudSyncStatusService(
+                accountStatusChecker: StubCloudChecker(status: .available, error: nil),
+                readinessProvider: {
+                    CloudKitReadiness(
+                        hasUbiquityContainerIdentifier: true,
+                        hasICloudServices: true,
+                        hasCloudKitContainerEnvironment: true
+                    )
+                }
+            ),
+            authService: StubBiometricAuthService(canAuthenticateValue: true),
+            applyRecurringAction: { _ in
+                throw NSError(domain: "SettingsViewModelTests", code: 1, userInfo: [NSLocalizedDescriptionKey: "Recurring run failed"])
+            }
+        )
+
+        viewModel.applyRecurring(in: context)
+
+        XCTAssertEqual(viewModel.recurringApplyFeedback, .failure(message: "Recurring run failed"))
     }
 }
 

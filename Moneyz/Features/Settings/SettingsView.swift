@@ -10,14 +10,22 @@ struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
     @State private var showingPINSetup = false
 
-    private let recurringService: RecurringTransactionService
-
     init(
         viewModel: SettingsViewModel? = nil,
         recurringService: RecurringTransactionService? = nil
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel ?? SettingsViewModel())
-        self.recurringService = recurringService ?? RecurringTransactionService()
+        let resolvedViewModel: SettingsViewModel
+        if let viewModel {
+            resolvedViewModel = viewModel
+        } else {
+            let resolvedRecurringService = recurringService ?? RecurringTransactionService()
+            resolvedViewModel = SettingsViewModel(
+                applyRecurringAction: { context in
+                    try resolvedRecurringService.applyDueRules(in: context)
+                }
+            )
+        }
+        _viewModel = StateObject(wrappedValue: resolvedViewModel)
     }
 
     private var pinToggleBinding: Binding<Bool> {
@@ -203,12 +211,7 @@ struct SettingsView: View {
                     sectionCard(titleKey: "settings.data") {
                         VStack(alignment: .leading, spacing: 14) {
                             Button {
-                                do {
-                                    let appliedCount = try recurringService.applyDueRules(in: modelContext)
-                                    viewModel.recordRecurringApplySuccess(appliedCount: appliedCount)
-                                } catch {
-                                    viewModel.recordRecurringApplyFailure(error)
-                                }
+                                viewModel.applyRecurring(in: modelContext)
                             } label: {
                                 Label(AppLocalizer.string("settings.applyRecurring"), systemImage: "repeat.circle.fill")
                             }

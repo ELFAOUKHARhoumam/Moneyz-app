@@ -16,8 +16,6 @@ struct AddEditTransactionView: View {
     @StateObject private var viewModel: AddEditTransactionViewModel
     @State private var showingDeleteConfirmation = false
 
-    private let repository = TransactionRepository()
-
     init(transaction: MoneyTransaction?) {
         _viewModel = StateObject(wrappedValue: AddEditTransactionViewModel(transaction: transaction))
     }
@@ -160,13 +158,8 @@ struct AddEditTransactionView: View {
     }
 
     private func deleteTransaction() {
-        guard let existingTransaction = viewModel.existingTransaction else { return }
-
-        do {
-            try repository.delete(existingTransaction, in: modelContext)
+        if viewModel.delete(in: modelContext) {
             dismiss()
-        } catch {
-            viewModel.errorMessage = error.localizedDescription
         }
     }
 }

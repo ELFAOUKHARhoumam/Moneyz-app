@@ -210,8 +210,8 @@
 "onboarding.currency" = "Choose your main currency";
 "onboarding.paycheckDay" = "When is your paycheck day?";
 "onboarding.paycheckValue" = "Paycheck day:";
-"onboarding.enablePIN" = "Protect the app with a 4-digit PIN";
-"onboarding.pinRequired" = "Set a 4-digit PIN before continuing.";
+"onboarding.enablePIN" = "Protect the app with a secure 4-digit PIN";
+"onboarding.pinRequired" = "Set a secure 4-digit PIN before continuing.";
 "onboarding.continue" = "Continue";
 
 "lock.title" = "Unlock Moneyz";
@@ -224,13 +224,16 @@
 "pin.code" = "4-digit PIN";
 "pin.new" = "New 4-digit PIN";
 "pin.confirm" = "Confirm PIN";
-"pin.footer" = "Use a simple 4-digit PIN for quick access. You can change or remove it later in Settings.";
+"pin.footer" = "Use a 4-digit PIN for quick access, but avoid repeated or sequential digits. You can change or remove it later in Settings.";
 "pin.setupNow" = "Set PIN now";
 "pin.action.save" = "Save PIN";
 "pin.action.update" = "Update PIN";
 "pin.validation.length" = "Enter a valid 4-digit PIN.";
+"pin.validation.weakRepeated" = "Choose a PIN that does not use the same digit four times.";
+"pin.validation.weakSequence" = "Choose a PIN that is not an obvious ascending or descending sequence.";
 "pin.validation.match" = "PIN entries do not match.";
 "pin.validation.invalid" = "The PIN you entered is incorrect.";
+"pin.retryDelay" = "Too many incorrect PIN attempts. Please wait and try again.";
 "pin.saveFailed" = "Unable to save the PIN right now. Please try again.";
 
 "dashboard.overview" = "Overview";
@@ -245,6 +248,10 @@
 
 "common.deleteConfirmMessage" = "This action cannot be undone.";
 
+"common.archiveConfirmTitle" = "Archive this item?";
+
+"common.archiveConfirmMessage" = "You can still keep using Moneyz, but this archived item will be hidden from active lists.";
+
 "lock.pin.empty" = "No PIN entered";
 "lock.pin.digitsEntered" = "%d of 4 digits entered";
 "lock.pin.hint" = "Enter your 4-digit PIN to unlock Moneyz.";
@@ -252,3 +259,15 @@
 "onboarding.paycheckStepper.hint" = "Adjust the day of the month when your salary cycle starts.";
 "onboarding.pinToggle.hint" = "Turn on PIN protection during setup.";
 "onboarding.continue.hint" = "Finish setup and open the app.";
+
+"persistence.failed.title" = "Moneyz couldn't open your data";
+"persistence.failed.retry" = "Try Again";
+"persistence.failed.cloudKitConfiguration" = "iCloud sync is misconfigured for this build. Check the CloudKit capability and container setup.";
+"persistence.failed.cloudKitRuntime" = "Moneyz couldn't initialize its CloudKit-backed storage.";
+"persistence.failed.localStoreCorrupted" = "Moneyz detected corruption in the local data store.";
+"persistence.failed.localStoreUnavailable" = "Moneyz couldn't open the local data store.";
+"persistence.failed.migrationFailure" = "Moneyz couldn't migrate your existing data to the latest version.";
+"persistence.failed.unknown" = "Moneyz couldn't initialize persistent storage.";
+"persistence.details.title" = "Technical details";
+"persistence.banner.localOnly" = "Moneyz is running locally only because iCloud-backed storage could not start.";
+"persistence.banner.inMemory" = "Moneyz is running in temporary memory mode. Changes will not persist after you close the app.";

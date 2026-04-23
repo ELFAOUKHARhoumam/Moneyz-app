@@ -15,7 +15,6 @@ struct DebtView: View {
     private var debts: [DebtRecord]
 
     @StateObject private var viewModel: DebtViewModel
-    private let repository = DebtRepository()
 
     private var summary: DebtSummary {
         viewModel.summary(from: debts)
@@ -106,7 +105,7 @@ struct DebtView: View {
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
-                                        deleteDebt(debt)
+                                        viewModel.requestDelete(debt)
                                     } label: {
                                         Label(AppLocalizer.string("common.delete"), systemImage: "trash")
                                     }
@@ -162,13 +161,22 @@ struct DebtView: View {
                 Text(viewModel.errorMessage ?? "")
             }
         )
-    }
-
-    private func deleteDebt(_ debt: DebtRecord) {
-        do {
-            try repository.delete(debt, in: modelContext)
-        } catch {
-            viewModel.errorMessage = error.localizedDescription
+        .confirmationDialog(
+            AppLocalizer.string("common.deleteConfirmTitle"),
+            isPresented: Binding(
+                get: { viewModel.pendingDeletionDebt != nil },
+                set: { if !$0 { viewModel.cancelPendingDelete() } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(AppLocalizer.string("common.delete"), role: .destructive) {
+                viewModel.confirmDelete(in: modelContext)
+            }
+            Button(AppLocalizer.string("common.cancel"), role: .cancel) {
+                viewModel.cancelPendingDelete()
+            }
+        } message: {
+            Text(AppLocalizer.string("common.deleteConfirmMessage"))
         }
     }
 

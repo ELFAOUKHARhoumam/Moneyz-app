@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import SwiftData
 
 @MainActor
 final class SettingsViewModel: ObservableObject {
@@ -40,15 +41,20 @@ final class SettingsViewModel: ObservableObject {
 
     private let cloudService: CloudSyncStatusService
     private let authService: BiometricAuthServing
+    private let applyRecurringAction: @MainActor (ModelContext) throws -> Int
     private var cancellables: Set<AnyCancellable> = []
 
     init(
         cloudService: CloudSyncStatusService? = nil,
-        authService: BiometricAuthServing? = nil
+        authService: BiometricAuthServing? = nil,
+        applyRecurringAction: (@MainActor (ModelContext) throws -> Int)? = nil
     ) {
         let resolvedAuthService = authService ?? BiometricAuthService()
         self.cloudService = cloudService ?? CloudSyncStatusService()
         self.authService = resolvedAuthService
+        self.applyRecurringAction = applyRecurringAction ?? { context in
+            try RecurringTransactionService().applyDueRules(in: context)
+        }
         self.openingBalanceText = ""
         self.biometricsAvailable = resolvedAuthService.canAuthenticate()
 
@@ -98,6 +104,15 @@ final class SettingsViewModel: ObservableObject {
         PINSecurity.removePIN()
         settings.usePINLock = false
         saveErrorMessage = nil
+    }
+
+    func applyRecurring(in context: ModelContext) {
+        do {
+            let appliedCount = try applyRecurringAction(context)
+            recordRecurringApplySuccess(appliedCount: appliedCount)
+        } catch {
+            recordRecurringApplyFailure(error)
+        }
     }
 
     func recordRecurringApplySuccess(appliedCount: Int) {
