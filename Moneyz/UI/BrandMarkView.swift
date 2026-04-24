@@ -51,6 +51,8 @@ struct BrandMarkView: View {
     }
 
     private var brandUIImage: UIImage? {
-        UIImage(named: "BrandMark")
+        // Prefer a dedicated premium asset if present, otherwise fall back.
+        // This lets us swap premium branding without breaking builds.
+        UIImage(named: "PremiumBrandMark") ?? UIImage(named: "BrandMark")
     }
 }
