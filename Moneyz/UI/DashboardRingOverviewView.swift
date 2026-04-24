@@ -6,6 +6,8 @@ struct DashboardRingOverviewView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let summary: DashboardSummary
+    @State private var ringAnimationProgress: Double = 0
+    @State private var pulseCenterCard = false
 
     private struct RingMetric: Identifiable {
         let titleKey: String
@@ -94,43 +96,60 @@ struct DashboardRingOverviewView: View {
             metricsList
         }
         .premiumCard(cornerRadius: 30, padding: 18)
+        .onAppear {
+            triggerRingAnimation()
+            pulseCenterCard = true
+        }
+        .onChange(of: summary.incomeMinor) { _, _ in
+            triggerRingAnimation()
+        }
+        .onChange(of: summary.expenseMinor) { _, _ in
+            triggerRingAnimation()
+        }
+        .onChange(of: summary.netDebtMinor) { _, _ in
+            triggerRingAnimation()
+        }
     }
 
     private var heroCard: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             GeometryReader { proxy in
-                let size = min(proxy.size.width, 300)
-                let ringLineWidth: CGFloat = 18
-                let ringStep: CGFloat = 42
+                let size = min(proxy.size.width, 294)
+                let ringLineWidth: CGFloat = 16
+                let ringStep: CGFloat = 36
 
                 ZStack {
                     Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.18 : 0.12),
+                                    PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.12 : 0.08),
                                     Color.clear
                                 ],
                                 center: .center,
                                 startRadius: 24,
-                                endRadius: size * 0.56
+                                endRadius: size * 0.50
                             )
                         )
-                        .frame(width: size * 0.94, height: size * 0.94)
+                        .frame(width: size * 0.90, height: size * 0.90)
 
                     Circle()
-                        .stroke(Color.white.opacity(colorScheme == .dark ? 0.08 : 0.34), lineWidth: 1)
+                        .stroke(Color.white.opacity(colorScheme == .dark ? 0.06 : 0.18), lineWidth: 1)
                         .frame(width: size * 0.92, height: size * 0.92)
 
                     ForEach(Array(metrics.enumerated()), id: \.element.id) { index, metric in
                         let ringSize = size - CGFloat(index) * ringStep
 
                         FullRingView(
-                            progress: metric.magnitude / totalMagnitude,
+                            progress: animatedRingProgress(for: metric),
                             colors: metric.colors,
                             lineWidth: ringLineWidth
                         )
                         .frame(width: ringSize, height: ringSize)
+                        .animation(
+                            .spring(response: 0.72, dampingFraction: 0.86).delay(Double(index) * 0.08),
+                            value: ringAnimationProgress
+                        )
                     }
 
                     centerBalanceCard
@@ -149,7 +168,9 @@ struct DashboardRingOverviewView: View {
                     )
                 )
             }
-            .frame(height: 300)
+            .frame(height: 280)
+
+            ringLegend
 
             HStack(spacing: 12) {
                 HeroMetricPill(
@@ -175,7 +196,7 @@ struct DashboardRingOverviewView: View {
                 )
             }
         }
-        .padding(20)
+        .padding(18)
         .background(
             RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
@@ -186,16 +207,16 @@ struct DashboardRingOverviewView: View {
         )
         .overlay(alignment: .topTrailing) {
             Circle()
-                .fill(PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.18 : 0.10))
-                .frame(width: 140, height: 140)
-                .blur(radius: 28)
+                .fill(PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.12 : 0.06))
+                .frame(width: 104, height: 104)
+                .blur(radius: 18)
                 .offset(x: 20, y: -20)
         }
         .overlay(alignment: .bottomLeading) {
             Circle()
-                .fill(PremiumTheme.Palette.info.opacity(colorScheme == .dark ? 0.16 : 0.08))
-                .frame(width: 120, height: 120)
-                .blur(radius: 24)
+                .fill(PremiumTheme.Palette.accentWarm.opacity(colorScheme == .dark ? 0.10 : 0.05))
+                .frame(width: 92, height: 92)
+                .blur(radius: 18)
                 .offset(x: -16, y: 14)
         }
     }
@@ -218,6 +239,7 @@ struct DashboardRingOverviewView: View {
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.65)
+                .foregroundStyle(balanceColors.first ?? .primary)
 
             Text(AppLocalizer.string("dashboard.balance"))
                 .font(.subheadline.weight(.medium))
@@ -266,7 +288,15 @@ struct DashboardRingOverviewView: View {
             Circle()
                 .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.26 : 0.10), radius: 18, y: 10)
+        .overlay {
+            Circle()
+                .stroke((balanceColors.first ?? PremiumTheme.Palette.accent).opacity(colorScheme == .dark ? 0.34 : 0.22), lineWidth: 2)
+                .padding(8)
+                .scaleEffect(pulseCenterCard ? 1.03 : 0.96)
+                .animation(.easeInOut(duration: 2.8).repeatForever(autoreverses: true), value: pulseCenterCard)
+        }
+        .shadow(color: (balanceColors.first ?? PremiumTheme.Palette.accent).opacity(colorScheme == .dark ? 0.24 : 0.16), radius: 20, y: 10)
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.24 : 0.08), radius: 16, y: 8)
     }
 
     private var insightsRow: some View {
@@ -302,7 +332,7 @@ struct DashboardRingOverviewView: View {
                         locale: settings.locale
                     ),
                     percentageText: percentageText(for: metric),
-                    progress: metric.magnitude / totalMagnitude,
+                    progress: animatedRingProgress(for: metric),
                     colors: metric.colors,
                     systemImage: metric.systemImage
                 )
@@ -313,6 +343,30 @@ struct DashboardRingOverviewView: View {
     private func percentageText(for metric: RingMetric) -> String {
         let fraction = metric.magnitude / totalMagnitude
         return fraction.formatted(.percent.precision(.fractionLength(0)))
+    }
+
+    private var ringLegend: some View {
+        HStack(spacing: 8) {
+            ForEach(metrics) { metric in
+                RingLegendChipView(
+                    title: AppLocalizer.string(metric.titleKey),
+                    percentageText: percentageText(for: metric),
+                    colors: metric.colors,
+                    systemImage: metric.systemImage
+                )
+            }
+        }
+    }
+
+    private func animatedRingProgress(for metric: RingMetric) -> Double {
+        (metric.magnitude / totalMagnitude) * ringAnimationProgress
+    }
+
+    private func triggerRingAnimation() {
+        ringAnimationProgress = 0
+        withAnimation(.spring(response: 0.90, dampingFraction: 0.88)) {
+            ringAnimationProgress = 1
+        }
     }
 }
 
@@ -343,6 +397,13 @@ private struct FullRingView: View {
                     Color.primary.opacity(colorScheme == .dark ? 0.14 : 0.08),
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)
                 )
+
+            Circle()
+                .stroke(
+                    Color.white.opacity(colorScheme == .dark ? 0.08 : 0.18),
+                    style: StrokeStyle(lineWidth: 1.1, lineCap: .round, dash: [2.0, 7.0])
+                )
+                .padding(lineWidth * 0.42)
 
             if clampedProgress > 0 {
                 Circle()
@@ -410,6 +471,10 @@ private struct MetricRowView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
+    private var splitAmount: (prefix: String, amount: String)? {
+        amountText.monetarySplit
+    }
+
     var body: some View {
         HStack(spacing: 14) {
             PremiumTheme.IconBadge(systemImage: systemImage, colors: colors, size: 44, symbolSize: 15)
@@ -419,10 +484,32 @@ private struct MetricRowView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(title)
                             .font(.subheadline.weight(.semibold))
-                        Text(amountText)
-                            .font(.body.weight(.bold))
-                            .monospacedDigit()
-                            .foregroundStyle(colorScheme == .dark ? .white : .primary)
+
+                        if let splitAmount {
+                            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                                Text(splitAmount.prefix)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(colors.first ?? PremiumTheme.Palette.accent)
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule(style: .continuous)
+                                            .fill((colors.first ?? PremiumTheme.Palette.accent).opacity(colorScheme == .dark ? 0.16 : 0.10))
+                                    )
+
+                                Text(splitAmount.amount)
+                                    .font(.body.weight(.bold))
+                                    .monospacedDigit()
+                                    .foregroundStyle(colorScheme == .dark ? .white : .primary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.70)
+                            }
+                        } else {
+                            Text(amountText)
+                                .font(.body.weight(.bold))
+                                .monospacedDigit()
+                                .foregroundStyle(colorScheme == .dark ? .white : .primary)
+                        }
                     }
 
                     Spacer()
@@ -494,6 +581,10 @@ private struct HeroMetricPill: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
+    private var splitAmount: (prefix: String, amount: String)? {
+        amountText.monetarySplit
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             PremiumTheme.IconBadge(systemImage: systemImage, colors: colors, size: 34, symbolSize: 12)
@@ -503,11 +594,25 @@ private struct HeroMetricPill: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
-                Text(amountText)
-                    .font(.subheadline.weight(.bold))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+                if let splitAmount {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Text(splitAmount.prefix)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(colors.first ?? PremiumTheme.Palette.accent)
+
+                        Text(splitAmount.amount)
+                            .font(.subheadline.weight(.bold))
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                    }
+                } else {
+                    Text(amountText)
+                        .font(.subheadline.weight(.bold))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
             }
 
             Spacer(minLength: 0)
@@ -534,6 +639,10 @@ private struct OverviewInsightCard: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
+    private var splitAmount: (prefix: String, amount: String)? {
+        valueText.monetarySplit
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
@@ -545,11 +654,25 @@ private struct OverviewInsightCard: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
 
-            Text(valueText)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+            if let splitAmount {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(splitAmount.prefix)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(colors.first ?? PremiumTheme.Palette.accent)
+
+                    Text(splitAmount.amount)
+                        .font(.system(size: 21, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.70)
+                }
+            } else {
+                Text(valueText)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
 
             Text(subtitleText)
                 .font(.caption)
@@ -579,5 +702,68 @@ private struct OverviewInsightCard: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
         )
+    }
+}
+
+private struct RingLegendChipView: View {
+    let title: String
+    let percentageText: String
+    let colors: [Color]
+    let systemImage: String
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(colors.first ?? PremiumTheme.Palette.accent)
+                    .frame(width: 7, height: 7)
+
+                Image(systemName: systemImage)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(colors.first ?? PremiumTheme.Palette.accent)
+            }
+
+            Text(title)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .minimumScaleFactor(0.78)
+
+            Text(percentageText)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(colors.first ?? PremiumTheme.Palette.accent)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color.primary.opacity(colorScheme == .dark ? 0.08 : 0.04))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
+        )
+    }
+}
+
+private extension String {
+    var monetarySplit: (prefix: String, amount: String)? {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let separatorIndex = trimmed.firstIndex(of: " ") else {
+            return nil
+        }
+
+        let prefix = String(trimmed[..<separatorIndex])
+        let amountStart = trimmed.index(after: separatorIndex)
+        let amount = String(trimmed[amountStart...])
+
+        guard !prefix.isEmpty, !amount.isEmpty else {
+            return nil
+        }
+
+        return (prefix, amount)
     }
 }

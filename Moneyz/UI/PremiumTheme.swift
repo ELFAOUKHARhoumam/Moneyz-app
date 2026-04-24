@@ -100,11 +100,11 @@ enum PremiumTheme {
         }
 
         static func shadowColor(for colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? .black.opacity(0.34) : .black.opacity(0.12)
+            colorScheme == .dark ? .black.opacity(0.26) : .black.opacity(0.08)
         }
 
         static func softShadowColor(for colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? .black.opacity(0.18) : accent.opacity(0.12)
+            colorScheme == .dark ? .black.opacity(0.12) : accent.opacity(0.07)
         }
 
         static func metricColors(for titleKey: String, systemImage: String? = nil) -> [Color] {
@@ -134,7 +134,7 @@ enum PremiumTheme {
 
                 LinearGradient(
                     colors: [
-                        Color.white.opacity(colorScheme == .dark ? 0.03 : 0.30),
+                        Color.white.opacity(colorScheme == .dark ? 0.02 : 0.16),
                         Color.clear
                     ],
                     startPoint: .top,
@@ -143,34 +143,34 @@ enum PremiumTheme {
 
                 RadialGradient(
                     colors: [
-                        Palette.accent.opacity(colorScheme == .dark ? 0.28 : 0.18),
+                        Palette.accent.opacity(colorScheme == .dark ? 0.18 : 0.11),
                         Color.clear
                     ],
                     center: .topTrailing,
                     startRadius: 40,
-                    endRadius: 360
+                    endRadius: 320
                 )
                 .offset(x: 120, y: -80)
 
                 RadialGradient(
                     colors: [
-                        Palette.accentWarm.opacity(colorScheme == .dark ? 0.15 : 0.10),
+                        Palette.accentWarm.opacity(colorScheme == .dark ? 0.10 : 0.06),
                         Color.clear
                     ],
                     center: .bottomLeading,
                     startRadius: 30,
-                    endRadius: 320
+                    endRadius: 280
                 )
                 .offset(x: -120, y: 120)
 
                 RadialGradient(
                     colors: [
-                        Palette.info.opacity(colorScheme == .dark ? 0.14 : 0.08),
+                        Palette.info.opacity(colorScheme == .dark ? 0.10 : 0.05),
                         Color.clear
                     ],
                     center: .center,
                     startRadius: 10,
-                    endRadius: 280
+                    endRadius: 220
                 )
             }
         }
@@ -192,13 +192,14 @@ enum PremiumTheme {
                 .overlay(
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
+                        .allowsHitTesting(false)
                 )
                 .overlay(alignment: .topLeading) {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(colorScheme == .dark ? 0.08 : 0.55),
+                                    Color.white.opacity(colorScheme == .dark ? 0.05 : 0.30),
                                     Color.white.opacity(0.0)
                                 ],
                                 startPoint: .topLeading,
@@ -209,9 +210,10 @@ enum PremiumTheme {
                             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                                 .padding(1)
                         )
+                        .allowsHitTesting(false)
                 }
-                .shadow(color: Palette.shadowColor(for: colorScheme), radius: colorScheme == .dark ? 18 : 22, x: 0, y: 12)
-                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 10, x: 0, y: 2)
+                .shadow(color: Palette.shadowColor(for: colorScheme), radius: colorScheme == .dark ? 14 : 16, x: 0, y: 10)
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 6, x: 0, y: 2)
         }
     }
 
@@ -231,8 +233,9 @@ enum PremiumTheme {
                 .overlay(
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
+                        .allowsHitTesting(false)
                 )
-                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 8, x: 0, y: 4)
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 5, x: 0, y: 3)
         }
     }
 
@@ -250,6 +253,7 @@ enum PremiumTheme {
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
+                        .allowsHitTesting(false)
                 )
                 .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 8, x: 0, y: 3)
         }
@@ -275,6 +279,7 @@ enum PremiumTheme {
                 .overlay(
                     Capsule(style: .continuous)
                         .strokeBorder(Palette.borderColor(for: colorScheme), lineWidth: 1)
+                        .allowsHitTesting(false)
                 )
                 .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 10, x: 0, y: 4)
         }
@@ -287,15 +292,15 @@ enum PremiumTheme {
 
         func body(content: Content) -> some View {
             content
-                .font(.system(size: 15, weight: .bold))
+                .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(colorScheme == .dark ? .white : accent)
-                .frame(width: 38, height: 38)
+                .frame(width: 34, height: 34)
                 .background(
                     Circle()
                         .fill(
                             colorScheme == .dark
                                 ? Color.white.opacity(0.10)
-                                : Color.white.opacity(0.82)
+                                : Color.white.opacity(0.86)
                         )
                 )
                 .overlay(
@@ -304,8 +309,9 @@ enum PremiumTheme {
                             colorScheme == .dark ? Color.white.opacity(0.08) : accent.opacity(0.12),
                             lineWidth: 1
                         )
+                        .allowsHitTesting(false)
                 )
-                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 10, x: 0, y: 4)
+                .shadow(color: Palette.softShadowColor(for: colorScheme), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -364,7 +370,7 @@ enum PremiumTheme {
                     .foregroundStyle(.white)
             }
             .frame(width: size, height: size)
-            .shadow(color: (colors.first ?? Palette.accent).opacity(0.25), radius: 12, x: 0, y: 8)
+            .shadow(color: (colors.first ?? Palette.accent).opacity(0.18), radius: 8, x: 0, y: 5)
         }
     }
 

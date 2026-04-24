@@ -142,7 +142,7 @@ struct DebtView: View {
                 Button {
                     viewModel.presentEditor()
                 } label: {
-                    Image(systemName: "plus.circle.fill")
+                    Image(systemName: "plus")
                 }
                 .buttonStyle(.plain)
                 .premiumToolbarButton()

@@ -45,7 +45,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
                     heroCard
                     dashboardControlsCard
                     overviewSection
@@ -53,7 +53,7 @@ struct HomeView: View {
                     recentTransactionsSection
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 12)
+                .padding(.top, 10)
                 .padding(.bottom, 40)
             }
         }
@@ -66,10 +66,10 @@ struct HomeView: View {
                     showingAddTransaction = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .symbolRenderingMode(.hierarchical)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, PremiumTheme.Palette.accent)
                 }
                 .buttonStyle(.plain)
-                .premiumToolbarButton()
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
@@ -95,7 +95,7 @@ struct HomeView: View {
     }
 
     private var heroCard: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .top, spacing: 16) {
                 BrandMarkView(size: 62, cornerRadius: 20)
 
@@ -117,31 +117,17 @@ struct HomeView: View {
 
                 Spacer(minLength: 12)
 
-                VStack(spacing: 10) {
-                    Button {
-                        showingAddTransaction = true
-                    } label: {
-                        PremiumTheme.IconBadge(
-                            systemImage: "plus",
-                            colors: [PremiumTheme.Palette.accent, PremiumTheme.Palette.accentSecondary],
-                            size: 46,
-                            symbolSize: 18
-                        )
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        showingGrocery = true
-                    } label: {
-                        PremiumTheme.IconBadge(
-                            systemImage: "cart.fill",
-                            colors: [PremiumTheme.Palette.warning, PremiumTheme.Palette.warningSoft],
-                            size: 46,
-                            symbolSize: 18
-                        )
-                    }
-                    .buttonStyle(.plain)
+                Button {
+                    showingGrocery = true
+                } label: {
+                    PremiumTheme.IconBadge(
+                        systemImage: "cart.fill",
+                        colors: [PremiumTheme.Palette.warning, PremiumTheme.Palette.warningSoft],
+                        size: 46,
+                        symbolSize: 18
+                    )
                 }
+                .buttonStyle(.plain)
             }
 
             HStack(spacing: 12) {
@@ -162,7 +148,7 @@ struct HomeView: View {
                 )
             }
         }
-        .padding(20)
+        .padding(18)
         .background(
             RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(PremiumTheme.Palette.heroFill(for: colorScheme))
@@ -173,49 +159,48 @@ struct HomeView: View {
         )
         .overlay(alignment: .topTrailing) {
             Circle()
-                .fill(PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.18 : 0.10))
-                .frame(width: 120, height: 120)
-                .blur(radius: 18)
+                .fill(PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.12 : 0.06))
+                .frame(width: 96, height: 96)
+                .blur(radius: 14)
                 .offset(x: 18, y: -18)
         }
         .overlay(alignment: .bottomLeading) {
             Circle()
-                .fill(PremiumTheme.Palette.accentWarm.opacity(colorScheme == .dark ? 0.16 : 0.08))
-                .frame(width: 110, height: 110)
-                .blur(radius: 18)
+                .fill(PremiumTheme.Palette.accentWarm.opacity(colorScheme == .dark ? 0.10 : 0.05))
+                .frame(width: 88, height: 88)
+                .blur(radius: 14)
                 .offset(x: -14, y: 14)
         }
-        .shadow(color: PremiumTheme.Palette.shadowColor(for: colorScheme), radius: 22, x: 0, y: 12)
+        .shadow(color: PremiumTheme.Palette.shadowColor(for: colorScheme), radius: 14, x: 0, y: 10)
     }
 
     private var dashboardControlsCard: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 14) {
             PremiumTheme.SectionHeaderView(
                 title: AppLocalizer.string("dashboard.overview"),
                 subtitle: AppLocalizer.string("dashboard.style.label")
             )
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalizer.string("time.range"))
-                    .font(.subheadline.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
-
                 Picker(AppLocalizer.string("time.range"), selection: $viewModel.rangeOption) {
                     ForEach(TimeRangeOption.allCases) { option in
                         Text(AppLocalizer.string(option.localizedKey)).tag(option)
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(6)
+                .padding(5)
                 .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Color.primary.opacity(colorScheme == .dark ? 0.10 : 0.04))
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Color.primary.opacity(colorScheme == .dark ? 0.08 : 0.035))
                 )
             }
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(AppLocalizer.string("dashboard.style.label"))
-                    .font(.subheadline.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
 
                 Picker(AppLocalizer.string("dashboard.style.label"), selection: $settings.homeOverviewStyle) {
@@ -224,14 +209,14 @@ struct HomeView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(6)
+                .padding(5)
                 .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Color.primary.opacity(colorScheme == .dark ? 0.10 : 0.04))
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Color.primary.opacity(colorScheme == .dark ? 0.08 : 0.035))
                 )
             }
         }
-        .premiumCard(cornerRadius: 28, padding: 18)
+        .premiumSecondaryCard(cornerRadius: 26, padding: 16)
     }
 
     private var overviewSection: some View {
@@ -335,7 +320,7 @@ struct HomeView: View {
             }
             .frame(height: 12)
         }
-        .premiumCard(cornerRadius: 28, padding: 18)
+        .premiumSecondaryCard(cornerRadius: 26, padding: 18)
     }
 
     private var recentTransactionsSection: some View {
@@ -405,7 +390,7 @@ private struct HeroDetailCard: View {
                 .font(.subheadline.weight(.bold))
                 .monospacedDigit()
                 .lineLimit(2)
-                .minimumScaleFactor(0.74)
+                .minimumScaleFactor(0.68)
 
             Capsule(style: .continuous)
                 .fill(accent.opacity(colorScheme == .dark ? 0.75 : 0.90))
@@ -415,7 +400,7 @@ private struct HeroDetailCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Color.white.opacity(colorScheme == .dark ? 0.06 : 0.45))
+                .fill(Color.white.opacity(colorScheme == .dark ? 0.05 : 0.34))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)

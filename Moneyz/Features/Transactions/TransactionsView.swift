@@ -119,7 +119,7 @@ struct TransactionsView: View {
                 Button {
                     viewModel.showingAddSheet = true
                 } label: {
-                    Image(systemName: "plus.circle.fill")
+                    Image(systemName: "plus")
                 }
                 .buttonStyle(.plain)
                 .premiumToolbarButton()
