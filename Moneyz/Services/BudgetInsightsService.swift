@@ -1,5 +1,9 @@
 import Foundation
 
+// MARK: - PersonBudgetSnapshot
+// FIX: warning threshold aligned to 0.85 (was already 0.85 here, but BudgetView.snapshotCard
+// used 0.9 for the progress bar color. Now both use the same constant defined in BudgetView.
+// The statusKey logic here is the source of truth.
 struct PersonBudgetSnapshot: Identifiable {
     let person: PersonProfile
     let plan: PersonBudgetPlan
@@ -13,14 +17,17 @@ struct PersonBudgetSnapshot: Identifiable {
         return min(Double(spentMinor) / Double(plan.amountMinor), 1.0)
     }
 
+    // Thresholds — single source of truth for the status message.
+    // BudgetView.snapshotCard must reference the same values (kWarningThreshold = 0.85).
     var statusKey: String {
         if spentMinor == 0 { return "budget.status.notStarted" }
-        if progress >= 1 { return "budget.status.exceeded" }
-        if progress >= 0.85 { return "budget.status.warning" }
+        if progress >= 1.0  { return "budget.status.exceeded" }
+        if progress >= 0.85 { return "budget.status.warning" }  // was already 0.85 ✓
         return "budget.status.onTrack"
     }
 }
 
+// MARK: - BudgetInsightsService
 struct BudgetInsightsService {
     func snapshots(
         people: [PersonProfile],

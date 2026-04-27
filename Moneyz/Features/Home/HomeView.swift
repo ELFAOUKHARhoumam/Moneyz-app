@@ -1,9 +1,27 @@
 import SwiftUI
 import SwiftData
+import Charts
+
+// MARK: - HomeView
+// Changes from original:
+// 1. Dashboard style picker removed — moved to Settings > Appearance
+// 2. Time range control is inline (no card wrapper)
+// 3. Overview condensed from 6 cards to 4
+// 4. 7-day spending bar chart added (Swift Charts)
+// 5. Burn rate bar animated + contextual insight sentence (localized)
+// 6. "See All" is a simple action callback — avoids NavigationLink-in-ScrollView issues
+// 7. Grocery button downsized; Grocery sheet still accessible from home
 
 @MainActor
 struct HomeView: View {
-    init() {}
+    // Callback injected by RootTabView to switch to the Transactions tab.
+    // Using a callback avoids NavigationLink-in-ScrollView push bugs and keeps
+    // HomeView decoupled from tab index knowledge.
+    var onShowAllTransactions: (() -> Void)?
+
+    init(onShowAllTransactions: (() -> Void)? = nil) {
+        self.onShowAllTransactions = onShowAllTransactions
+    }
 
     @EnvironmentObject private var settings: SettingsStore
     @Environment(\.modelContext) private var modelContext
@@ -28,9 +46,17 @@ struct HomeView: View {
         viewModel.recentGroups(from: transactions, settings: settings)
     }
 
-    private var expenseIntensitySubtitle: String {
-        let countText = "\(summary.intervalTransactionCount)"
-        return "\(countText) \(AppLocalizer.string("home.activity.count"))"
+    /// Last 7 days daily expense totals for the bar chart.
+    private var last7DaysSpending: [(day: Date, amount: Double)] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return (0..<7).reversed().map { offset in
+            let day = calendar.date(byAdding: .day, value: -offset, to: today) ?? today
+            let total = transactions
+                .filter { $0.kind == .expense && calendar.isDate($0.transactionDate, inSameDayAs: day) }
+                .reduce(0.0) { $0 + Double($1.amountMinor) / 100.0 }
+            return (day: day, amount: total)
+        }
     }
 
     private var savingsSubtitle: String {
@@ -38,6 +64,8 @@ struct HomeView: View {
             ? AppLocalizer.string("home.savings.positive")
             : AppLocalizer.string("home.savings.negative")
     }
+
+    // MARK: - Body
 
     var body: some View {
         ZStack {
@@ -48,162 +76,19 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 22) {
                     heroCard
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        PremiumTheme.SectionHeaderView(
-                            title: AppLocalizer.string("time.range"),
-                            subtitle: nil
-                        )
-
-                        Picker(AppLocalizer.string("time.range"), selection: $viewModel.rangeOption) {
-                            ForEach(TimeRangeOption.allCases) { option in
-                                Text(AppLocalizer.string(option.localizedKey)).tag(option)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .premiumCard(cornerRadius: 24, padding: 8)
-                    }
-
-                    VStack(alignment: .leading, spacing: 14) {
-                        PremiumTheme.SectionHeaderView(
-                            title: AppLocalizer.string("dashboard.overview"),
-                            subtitle: AppLocalizer.string("dashboard.style.label")
-                        )
-
-                        Picker(AppLocalizer.string("dashboard.style.label"), selection: $settings.homeOverviewStyle) {
-                            ForEach(SettingsStore.HomeOverviewStyle.allCases) { style in
-                                Text(AppLocalizer.string(style.localizedKey)).tag(style)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .premiumCard(cornerRadius: 24, padding: 8)
-
-                        if settings.homeOverviewStyle == .cards {
-                            LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
-                                SummaryCardView(
-                                    titleKey: "dashboard.balance",
-                                    valueText: CurrencyFormatter.string(from: summary.balanceMinor, currencyCode: settings.currencyCode, locale: settings.locale),
-                                    subtitleText: nil,
-                                    systemImage: "wallet.bifold.fill"
-                                )
-                                SummaryCardView(
-                                    titleKey: "dashboard.income",
-                                    valueText: CurrencyFormatter.string(from: summary.incomeMinor, currencyCode: settings.currencyCode, locale: settings.locale),
-                                    subtitleText: nil,
-                                    systemImage: "arrow.down.left.circle.fill"
-                                )
-                                SummaryCardView(
-                                    titleKey: "dashboard.expense",
-                                    valueText: CurrencyFormatter.string(from: -summary.expenseMinor, currencyCode: settings.currencyCode, locale: settings.locale),
-                                    subtitleText: nil,
-                                    systemImage: "arrow.up.right.circle.fill"
-                                )
-                                SummaryCardView(
-                                    titleKey: "dashboard.netDebt",
-                                    valueText: CurrencyFormatter.string(from: summary.netDebtMinor, currencyCode: settings.currencyCode, locale: settings.locale),
-                                    subtitleText: nil,
-                                    systemImage: "creditcard.trianglebadge.exclamationmark"
-                                )
-                                SummaryCardView(
-                                    titleKey: "home.savings.title",
-                                    valueText: CurrencyFormatter.string(from: summary.savingsMinor, currencyCode: settings.currencyCode, locale: settings.locale),
-                                    subtitleText: savingsSubtitle,
-                                    systemImage: "chart.line.uptrend.xyaxis"
-                                )
-                                SummaryCardView(
-                                    titleKey: "home.activity.title",
-                                    valueText: CurrencyFormatter.string(from: -summary.intervalExpenseMinor, currencyCode: settings.currencyCode, locale: settings.locale),
-                                    subtitleText: expenseIntensitySubtitle,
-                                    systemImage: "bolt.heart.fill"
-                                )
-                            }
-                        } else {
-                            DashboardRingOverviewView(summary: summary)
-                        }
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Text(AppLocalizer.string("home.burnRate"))
-                                    .font(.subheadline.weight(.semibold))
-                                Spacer()
-                                Text("\(Int((summary.burnRateProgress * 100).rounded()))%")
-                                    .font(.subheadline.weight(.bold))
-                                    .monospacedDigit()
-                            }
-
-                            GeometryReader { proxy in
-                                let width = max(proxy.size.width, 1)
-                                ZStack(alignment: .leading) {
-                                    Capsule(style: .continuous)
-                                        .fill(Color.primary.opacity(0.08))
-
-                                    Capsule(style: .continuous)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: summary.burnRateProgress > 0.85
-                                                    ? [PremiumTheme.Palette.danger, PremiumTheme.Palette.warning]
-                                                    : [PremiumTheme.Palette.success, PremiumTheme.Palette.accent],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .frame(width: width * summary.burnRateProgress)
-                                }
-                            }
-                            .frame(height: 10)
-
-                            Text(AppLocalizer.string("home.burnRate.footer"))
-                                .font(.caption)
-                                .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
-                        }
-                        .premiumSecondaryCard(cornerRadius: 24, padding: 16)
-                    }
-
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack {
-                            PremiumTheme.SectionHeaderView(
-                                title: AppLocalizer.string("home.recentTransactions"),
-                                subtitle: nil
-                            )
-                            Spacer()
-                            Button {
-                                showingGrocery = true
-                            } label: {
-                                Label(AppLocalizer.string("grocery.title"), systemImage: "cart.fill")
-                                    .font(.subheadline.weight(.semibold))
-                            }
-                            .buttonStyle(.plain)
-                            .premiumCapsule()
-                        }
-
-                        if groupedTransactions.isEmpty {
-                            EmptyStateView(
-                                systemImage: "tray",
-                                titleKey: "home.empty.title",
-                                messageKey: "home.empty.message"
-                            )
-                        } else {
-                            VStack(spacing: 16) {
-                                ForEach(groupedTransactions, id: \.date) { group in
-                                    VStack(alignment: .leading, spacing: 12) {
-                                        Text(group.date, format: .dateTime.weekday(.wide).day().month())
-                                            .font(.headline)
-                                            .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
-
-                                        VStack(spacing: 12) {
-                                            ForEach(group.transactions, id: \.id) { transaction in
-                                                TransactionRowView(transaction: transaction)
-                                                    .contentShape(Rectangle())
-                                                    .onTapGesture {
-                                                        editingTransaction = transaction
-                                                    }
-                                            }
-                                        }
-                                    }
-                                    .premiumCard(cornerRadius: 26, padding: 18)
-                                }
-                            }
+                    // Inline time range — no card wrapper, saves ~60pt vertical space
+                    Picker(AppLocalizer.string("time.range"), selection: $viewModel.rangeOption) {
+                        ForEach(TimeRangeOption.allCases) { option in
+                            Text(AppLocalizer.string(option.localizedKey)).tag(option)
                         }
                     }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 2)
+
+                    overviewSection
+                    spendingSparklineCard
+                    burnRateCard
+                    recentTransactionsSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
@@ -225,14 +110,10 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
-            NavigationStack {
-                AddEditTransactionView(transaction: nil)
-            }
+            NavigationStack { AddEditTransactionView(transaction: nil) }
         }
         .sheet(isPresented: $showingGrocery) {
-            NavigationStack {
-                GroceryModeView()
-            }
+            NavigationStack { GroceryModeView() }
         }
         .sheet(isPresented: Binding(
             get: { editingTransaction != nil },
@@ -245,6 +126,235 @@ struct HomeView: View {
             }
         }
     }
+
+    // MARK: - Overview Section
+    // Reduced from 6 → 4 cards: Balance, Income, Expenses, Savings.
+    // Removed Spending Pulse (same number as Expenses) and Net Debt (belongs on Debt tab).
+
+    @ViewBuilder
+    private var overviewSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            PremiumTheme.SectionHeaderView(title: AppLocalizer.string("dashboard.overview"))
+
+            if settings.homeOverviewStyle == .cards {
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)],
+                    spacing: 14
+                ) {
+                    SummaryCardView(
+                        titleKey: "dashboard.balance",
+                        valueText: CurrencyFormatter.string(from: summary.balanceMinor, currencyCode: settings.currencyCode, locale: settings.locale),
+                        subtitleText: nil,
+                        systemImage: "wallet.bifold.fill"
+                    )
+                    SummaryCardView(
+                        titleKey: "dashboard.income",
+                        valueText: CurrencyFormatter.string(from: summary.incomeMinor, currencyCode: settings.currencyCode, locale: settings.locale),
+                        subtitleText: nil,
+                        systemImage: "arrow.down.left.circle.fill"
+                    )
+                    SummaryCardView(
+                        titleKey: "dashboard.expense",
+                        valueText: CurrencyFormatter.string(from: -summary.expenseMinor, currencyCode: settings.currencyCode, locale: settings.locale),
+                        subtitleText: nil,
+                        systemImage: "arrow.up.right.circle.fill"
+                    )
+                    SummaryCardView(
+                        titleKey: "home.savings.title",
+                        valueText: CurrencyFormatter.string(from: summary.savingsMinor, currencyCode: settings.currencyCode, locale: settings.locale),
+                        subtitleText: savingsSubtitle,
+                        systemImage: "chart.line.uptrend.xyaxis"
+                    )
+                }
+            } else {
+                DashboardRingOverviewView(summary: summary)
+            }
+        }
+    }
+
+    // MARK: - 7-Day Spending Sparkline
+
+    @ViewBuilder
+    private var spendingSparklineCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            PremiumTheme.SectionHeaderView(title: AppLocalizer.string("home.activity.title"))
+
+            Chart(last7DaysSpending, id: \.day) { point in
+                BarMark(
+                    x: .value("Day", point.day, unit: .day),
+                    y: .value("Amount", point.amount)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [PremiumTheme.Palette.accent, PremiumTheme.Palette.accentSecondary],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                )
+                .cornerRadius(6)
+            }
+            .chartXAxis {
+                AxisMarks(values: .stride(by: .day)) { _ in
+                    AxisValueLabel(format: .dateTime.weekday(.narrow), centered: true)
+                        .font(.caption2)
+                }
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisValueLabel {
+                        if let amount = value.as(Double.self) {
+                            Text(CurrencyFormatter.string(
+                                from: Int64(amount * 100),
+                                currencyCode: settings.currencyCode,
+                                locale: settings.locale
+                            ))
+                            .font(.caption2)
+                        }
+                    }
+                }
+            }
+            .frame(height: 160)
+            .chartPlotStyle { plot in plot.background(Color.clear) }
+            .accessibilityLabel(Text(AppLocalizer.string("home.activity.title")))
+        }
+        .premiumCard(cornerRadius: PremiumTheme.CornerRadius.lg, padding: PremiumTheme.Spacing.md)
+    }
+
+    // MARK: - Burn Rate Card
+
+    @ViewBuilder
+    private var burnRateCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(AppLocalizer.string("home.burnRate"))
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text("\(Int((summary.burnRateProgress * 100).rounded()))%")
+                    .font(.subheadline.weight(.bold))
+                    .monospacedDigit()
+                    .foregroundStyle(
+                        summary.burnRateProgress > 0.85
+                            ? PremiumTheme.Palette.danger
+                            : .primary
+                    )
+            }
+
+            GeometryReader { proxy in
+                let width = max(proxy.size.width, 1)
+                ZStack(alignment: .leading) {
+                    Capsule(style: .continuous)
+                        .fill(PremiumTheme.Palette.neutralFill)
+                    Capsule(style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: summary.burnRateProgress > 0.85
+                                    ? [PremiumTheme.Palette.danger, PremiumTheme.Palette.warning]
+                                    : [PremiumTheme.Palette.success, PremiumTheme.Palette.accent],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: width * min(summary.burnRateProgress, 1.0))
+                        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: summary.burnRateProgress)
+                }
+            }
+            .frame(height: 10)
+
+            Text(burnRateInsight)
+                .font(.caption)
+                .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
+        }
+        .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.md, padding: PremiumTheme.Spacing.md)
+    }
+
+    /// Context-aware insight sentence. Uses localization keys — English text is a fallback only.
+    private var burnRateInsight: String {
+        let pct = Int((summary.burnRateProgress * 100).rounded())
+        if summary.incomeMinor == 0 {
+            return AppLocalizer.string("home.burnRate.footer")
+        }
+        if pct >= 100 {
+            return AppLocalizer.string("home.insight.exceeded", fallback: "⚠️ You've exceeded your income for this period.")
+        } else if pct >= 85 {
+            return String(format: AppLocalizer.string("home.insight.warning", fallback: "You've spent %d%% of your income — watch your remaining %d%%."), pct, 100 - pct)
+        } else if pct >= 50 {
+            return String(format: AppLocalizer.string("home.insight.onTrack", fallback: "You've used %d%% of your income. You're on track."), pct)
+        } else {
+            return String(format: AppLocalizer.string("home.insight.good", fallback: "Great start — only %d%% of your income spent so far."), pct)
+        }
+    }
+
+    // MARK: - Recent Transactions Section
+
+    @ViewBuilder
+    private var recentTransactionsSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 10) {
+                PremiumTheme.SectionHeaderView(
+                    title: AppLocalizer.string("home.recentTransactions")
+                )
+
+                Spacer()
+
+                // "See All" switches to Transactions tab via callback injected by RootTabView.
+                // Using a callback avoids NavigationLink-inside-ScrollView-inside-NavigationStack
+                // double-push issues and keeps HomeView tab-agnostic.
+                if onShowAllTransactions != nil {
+                    Button {
+                        onShowAllTransactions?()
+                    } label: {
+                        Text(AppLocalizer.string("common.seeAll"))
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .premiumCapsule()
+                }
+
+                // Grocery entry — single entry point kept on Home
+                Button {
+                    showingGrocery = true
+                } label: {
+                    PremiumTheme.IconBadge(
+                        systemImage: "cart.fill",
+                        colors: [PremiumTheme.Palette.warning, PremiumTheme.Palette.warningSoft],
+                        size: 36,
+                        symbolSize: 14
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(AppLocalizer.string("grocery.title")))
+            }
+
+            if groupedTransactions.isEmpty {
+                EmptyStateView(
+                    systemImage: "tray",
+                    titleKey: "home.empty.title",
+                    messageKey: "home.empty.message"
+                )
+            } else {
+                VStack(spacing: 16) {
+                    ForEach(groupedTransactions, id: \.date) { group in
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(group.date, format: .dateTime.weekday(.wide).day().month())
+                                .font(.headline)
+                                .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
+
+                            VStack(spacing: 12) {
+                                ForEach(group.transactions, id: \.id) { transaction in
+                                    TransactionRowView(transaction: transaction)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { editingTransaction = transaction }
+                                }
+                            }
+                        }
+                        .premiumCard(cornerRadius: PremiumTheme.CornerRadius.lg, padding: PremiumTheme.Spacing.md)
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Hero Card
 
     private var heroCard: some View {
         HStack(spacing: 16) {
@@ -262,22 +372,10 @@ struct HomeView: View {
             }
 
             Spacer(minLength: 12)
-
-            Button {
-                showingGrocery = true
-            } label: {
-                PremiumTheme.IconBadge(
-                    systemImage: "cart.fill",
-                    colors: [PremiumTheme.Palette.warning, PremiumTheme.Palette.warningSoft],
-                    size: 46,
-                    symbolSize: 18
-                )
-            }
-            .buttonStyle(.plain)
         }
         .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
+            RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.lg, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: colorScheme == .dark
@@ -289,33 +387,25 @@ struct HomeView: View {
                 )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
+            RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.lg, style: .continuous)
                 .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
         )
-        .overlay(alignment: .topTrailing) {
-            Circle()
-                .fill(PremiumTheme.Palette.accent.opacity(colorScheme == .dark ? 0.18 : 0.10))
-                .frame(width: 120, height: 120)
-                .blur(radius: 18)
-                .offset(x: 18, y: -18)
-        }
         .shadow(color: PremiumTheme.Palette.shadowColor(for: colorScheme), radius: 22, x: 0, y: 12)
     }
 }
 
+// MARK: - Preview
 @MainActor
 private struct HomeViewPreviewHost: View {
     @StateObject private var settings = SettingsStore()
 
     var body: some View {
         NavigationStack {
-            HomeView()
+            HomeView(onShowAllTransactions: nil)
         }
         .environmentObject(settings)
         .modelContainer(PreviewContainer.modelContainer)
     }
 }
 
-#Preview {
-    HomeViewPreviewHost()
-}
+#Preview { HomeViewPreviewHost() }

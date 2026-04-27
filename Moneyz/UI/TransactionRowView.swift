@@ -1,5 +1,11 @@
 import SwiftUI
 
+// MARK: - TransactionRowView
+// FIX: Category emoji now overlays the icon badge instead of always showing a generic up/down arrow.
+// Root cause: IconBadge always used systemImage — the category information (emoji) was shown
+// only in the subtitle text, making rows visually identical regardless of category.
+// Fix: pass the category emoji as emojiOverlay to IconBadge when available.
+
 @MainActor
 struct TransactionRowView: View {
     @EnvironmentObject private var settings: SettingsStore
@@ -33,13 +39,25 @@ struct TransactionRowView: View {
         PremiumTheme.Palette.transactionColors(isExpense: transaction.kind == .expense)
     }
 
+    // Category emoji takes priority over the direction arrow when available.
+    // This gives each row a unique, instantly-recognizable identity.
+    private var badgeEmoji: String? {
+        guard let emoji = transaction.category?.emoji, !emoji.isEmpty else { return nil }
+        return emoji
+    }
+
+    private var fallbackSystemImage: String {
+        transaction.kind == .expense ? "arrow.up.right" : "arrow.down.left"
+    }
+
     var body: some View {
         HStack(spacing: 14) {
             PremiumTheme.IconBadge(
-                systemImage: transaction.kind == .expense ? "arrow.up.right" : "arrow.down.left",
+                systemImage: fallbackSystemImage,
                 colors: colors,
                 size: 46,
-                symbolSize: 16
+                symbolSize: 16,
+                emojiOverlay: badgeEmoji   // category emoji when present
             )
 
             VStack(alignment: .leading, spacing: 6) {
@@ -87,6 +105,6 @@ struct TransactionRowView: View {
             }
         }
         .padding(16)
-        .premiumSecondaryCard(cornerRadius: 22, padding: 0)
+        .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.md, padding: 0)
     }
 }

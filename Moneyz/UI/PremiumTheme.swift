@@ -3,7 +3,38 @@ import SwiftUI
 import UIKit
 #endif
 
+// MARK: - Design Token Extensions
+// Root cause of magic numbers throughout: no shared spacing/radius scale.
+// Every call site used ad-hoc values (8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32).
+// These tokens standardize to 5 spacing steps and 3 corner radius tiers.
+
 enum PremiumTheme {
+
+    // MARK: - Spacing Scale
+    enum Spacing {
+        /// 8pt — tight gaps, icon-to-label
+        static let xs: CGFloat = 8
+        /// 12pt — compact row padding
+        static let sm: CGFloat = 12
+        /// 16pt — standard section padding
+        static let md: CGFloat = 16
+        /// 24pt — card padding, section spacing
+        static let lg: CGFloat = 24
+        /// 32pt — screen edge padding, large separators
+        static let xl: CGFloat = 32
+    }
+
+    // MARK: - Corner Radius Scale
+    enum CornerRadius {
+        /// 16pt — inputs, small chips
+        static let sm: CGFloat = 16
+        /// 24pt — cards, section containers
+        static let md: CGFloat = 24
+        /// 32pt — screen-level containers, sheets
+        static let lg: CGFloat = 32
+    }
+
+    // MARK: - Palette
     enum Palette {
         static let accent = Color(red: 0.27, green: 0.49, blue: 0.98)
         static let accentSecondary = Color(red: 0.55, green: 0.42, blue: 0.98)
@@ -17,6 +48,10 @@ enum PremiumTheme {
 
         static let danger = Color(red: 0.96, green: 0.48, blue: 0.41)
         static let dangerSoft = Color(red: 1.00, green: 0.72, blue: 0.63)
+
+        // Neutral — previously missing, used Color.primary.opacity(0.08) everywhere
+        static let neutralFill = Color.primary.opacity(0.08)
+        static let neutralStroke = Color.primary.opacity(0.12)
 
         static let pageTopLight = Color(red: 0.95, green: 0.97, blue: 1.00)
         static let pageBottomLight = Color(red: 0.99, green: 0.99, blue: 1.00)
@@ -94,6 +129,7 @@ enum PremiumTheme {
         }
     }
 
+    // MARK: - Page Background
     struct PageBackground: View {
         @Environment(\.colorScheme) private var colorScheme
 
@@ -122,20 +158,11 @@ enum PremiumTheme {
                     endRadius: 320
                 )
                 .offset(x: -120, y: 120)
-
-                RadialGradient(
-                    colors: [
-                        Palette.info.opacity(colorScheme == .dark ? 0.14 : 0.08),
-                        Color.clear
-                    ],
-                    center: .center,
-                    startRadius: 10,
-                    endRadius: 280
-                )
             }
         }
     }
 
+    // MARK: - Card Modifiers
     struct CardModifier: ViewModifier {
         @Environment(\.colorScheme) private var colorScheme
 
@@ -182,8 +209,8 @@ enum PremiumTheme {
 
         func body(content: Content) -> some View {
             content
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .padding(.horizontal, Spacing.sm)
+                .padding(.vertical, Spacing.xs)
                 .background(.ultraThinMaterial, in: Capsule(style: .continuous))
                 .overlay(
                     Capsule(style: .continuous)
@@ -192,6 +219,7 @@ enum PremiumTheme {
         }
     }
 
+    // MARK: - Button Styles
     struct FilledButtonStyle: ButtonStyle {
         @Environment(\.colorScheme) private var colorScheme
 
@@ -209,10 +237,10 @@ enum PremiumTheme {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    in: RoundedRectangle(cornerRadius: CornerRadius.sm, style: .continuous)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    RoundedRectangle(cornerRadius: CornerRadius.sm, style: .continuous)
                         .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.10 : 0.20), lineWidth: 1)
                 )
                 .shadow(color: Palette.accent.opacity(configuration.isPressed ? 0.18 : 0.26), radius: 14, x: 0, y: 10)
@@ -221,11 +249,14 @@ enum PremiumTheme {
         }
     }
 
+    // MARK: - Icon Badge
     struct IconBadge: View {
         let systemImage: String
         let colors: [Color]
         var size: CGFloat = 48
         var symbolSize: CGFloat? = nil
+        /// Optional emoji overlay — used in TransactionRowView to show category emoji
+        var emojiOverlay: String? = nil
 
         var body: some View {
             ZStack {
@@ -242,33 +273,56 @@ enum PremiumTheme {
                     .fill(Color.white.opacity(0.10))
                     .padding(1)
 
-                Image(systemName: systemImage)
-                    .font(.system(size: symbolSize ?? size * 0.36, weight: .semibold))
-                    .foregroundStyle(.white)
+                if let emoji = emojiOverlay {
+                    // Category emoji overlay — more informative than generic arrow
+                    Text(emoji)
+                        .font(.system(size: symbolSize ?? size * 0.36))
+                } else {
+                    Image(systemName: systemImage)
+                        .font(.system(size: symbolSize ?? size * 0.36, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
             }
             .frame(width: size, height: size)
             .shadow(color: (colors.first ?? Palette.accent).opacity(0.25), radius: 12, x: 0, y: 8)
         }
     }
 
+    // MARK: - Section Header
     struct SectionHeaderView: View {
         let title: String
         var subtitle: String? = nil
+        var actionTitle: String? = nil
+        var action: (() -> Void)? = nil
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.title3.weight(.bold))
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.title3.weight(.bold))
 
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer()
+
+                if let actionTitle, let action {
+                    Button(action: action) {
+                        Text(actionTitle)
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .premiumCapsule()
                 }
             }
         }
     }
 
+    // MARK: - UIKit Appearance
     #if canImport(UIKit)
     static func configureUIKitAppearance() {
         let accent = UIColor(red: 0.27, green: 0.49, blue: 0.98, alpha: 1.0)
@@ -291,7 +345,6 @@ enum PremiumTheme {
                 .foregroundColor: selectedColor,
                 .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
             ]
-
             appearance.normal.iconColor = normalColor
             appearance.normal.titleTextAttributes = [
                 .foregroundColor: normalColor,
@@ -336,16 +389,17 @@ enum PremiumTheme {
     #endif
 }
 
+// MARK: - View Extensions
 extension View {
     func premiumPageBackground() -> some View {
         background(PremiumTheme.PageBackground().ignoresSafeArea())
     }
 
-    func premiumCard(cornerRadius: CGFloat = 26, padding: CGFloat = 18) -> some View {
+    func premiumCard(cornerRadius: CGFloat = PremiumTheme.CornerRadius.md, padding: CGFloat = PremiumTheme.Spacing.md) -> some View {
         modifier(PremiumTheme.CardModifier(cornerRadius: cornerRadius, contentPadding: padding))
     }
 
-    func premiumSecondaryCard(cornerRadius: CGFloat = 22, padding: CGFloat = 16) -> some View {
+    func premiumSecondaryCard(cornerRadius: CGFloat = PremiumTheme.CornerRadius.md, padding: CGFloat = PremiumTheme.Spacing.md) -> some View {
         modifier(PremiumTheme.SecondaryCardModifier(cornerRadius: cornerRadius, contentPadding: padding))
     }
 

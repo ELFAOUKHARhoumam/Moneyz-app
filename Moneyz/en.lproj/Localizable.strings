@@ -271,3 +271,53 @@
 "persistence.details.title" = "Technical details";
 "persistence.banner.localOnly" = "Moneyz is running locally only because iCloud-backed storage could not start.";
 "persistence.banner.inMemory" = "Moneyz is running in temporary memory mode. Changes will not persist after you close the app.";
+
+
+// Moneyz audit localization additions
+// Missing common keys (used in DebtView, BudgetView alerts)
+"common.error" = "Error";
+"common.ok" = "OK";
+
+// See All button on Home recent transactions
+"common.seeAll" = "See All";
+
+// Contextual burn-rate insight sentences on Home dashboard
+"home.insight.exceeded" = "⚠️ You've exceeded your income for this period.";
+"home.insight.warning" = "You've spent %d%% of your income — watch your remaining %d%%.";
+"home.insight.onTrack" = "You've used %d%% of your income. You're on track.";
+"home.insight.good" = "Great start — only %d%% of your income spent so far.";
+
+// Seed data — category names
+"seed.category.grocery"   = "Grocery";
+"seed.category.car"       = "Car";
+"seed.category.home"      = "Home";
+"seed.category.bills"     = "Bills";
+"seed.category.dining"    = "Dining";
+"seed.category.salary"    = "Salary";
+
+// Seed data — item names
+"seed.item.banana"        = "Banana";
+"seed.item.apple"         = "Apple";
+"seed.item.tomato"        = "Tomato";
+"seed.item.carrot"        = "Carrot";
+"seed.item.fuel"          = "Fuel";
+"seed.item.loan"          = "Loan";
+"seed.item.maintenance"   = "Maintenance";
+"seed.item.rent"          = "Rent";
+"seed.item.internet"      = "Internet";
+"seed.item.electricity"   = "Electricity";
+"seed.item.coffee"        = "Coffee";
+"seed.item.monthlySalary" = "Monthly Salary";
+
+// Seed data — group names
+"seed.group.fruits"       = "Fruits";
+"seed.group.vegetables"   = "Vegetables";
+"seed.group.dairy"        = "Dairy";
+"seed.group.pantry"       = "Pantry";
+"seed.group.protein"      = "Protein";
+
+// Seed data — grocery presets
+"seed.preset.milk"        = "Milk";
+"seed.preset.rice"        = "Rice";
+"seed.preset.chicken"     = "Chicken";
+"seed.preset.orange"      = "Orange";

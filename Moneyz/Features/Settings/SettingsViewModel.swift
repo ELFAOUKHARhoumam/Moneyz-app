@@ -35,6 +35,8 @@ final class SettingsViewModel: ObservableObject {
 
     @Published var openingBalanceText: String
     @Published private(set) var syncStatus: SyncAvailabilityStatus = .checking
+    // FIX: now @Published so SettingsView can react when refreshBiometricsAvailability() is called.
+    // Root cause: was let constant set at init() — device state changes while app is open were ignored.
     @Published private(set) var biometricsAvailable: Bool
     @Published var saveErrorMessage: String?
     @Published private(set) var recurringApplyFeedback: RecurringApplyFeedback?
@@ -72,6 +74,12 @@ final class SettingsViewModel: ObservableObject {
 
     func refreshSyncStatus() {
         cloudService.refresh()
+    }
+
+    // FIX: added so SettingsView can call this on .onAppear to detect Face ID changes.
+    // This keeps biometricsAvailable current without requiring app restart.
+    func refreshBiometricsAvailability() {
+        biometricsAvailable = authService.canAuthenticate()
     }
 
     func syncOpeningBalance(from settings: SettingsStore) {

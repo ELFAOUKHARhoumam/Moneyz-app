@@ -271,3 +271,53 @@
 "persistence.details.title" = "تفاصيل تقنية";
 "persistence.banner.localOnly" = "يعمل Moneyz محليًا فقط لأن التخزين المرتبط بـ iCloud تعذّر تشغيله.";
 "persistence.banner.inMemory" = "يعمل Moneyz في وضع ذاكرة مؤقتة. لن يتم حفظ التغييرات بعد إغلاق التطبيق.";
+
+
+// Moneyz audit localization additions
+// Missing common keys
+"common.error" = "خطأ";
+"common.ok" = "حسنًا";
+
+// See All button
+"common.seeAll" = "عرض الكل";
+
+// Contextual burn-rate insight sentences
+"home.insight.exceeded" = "⚠️ لقد تجاوزت دخلك لهذه الفترة.";
+"home.insight.warning" = "لقد أنفقت %d%% من دخلك — راقب الـ %d%% المتبقية.";
+"home.insight.onTrack" = "لقد استخدمت %d%% من دخلك. أنت على المسار الصحيح.";
+"home.insight.good" = "بداية رائعة — أنفقت %d%% فقط من دخلك حتى الآن.";
+
+// Seed data — category names
+"seed.category.grocery"   = "البقالة";
+"seed.category.car"       = "السيارة";
+"seed.category.home"      = "المنزل";
+"seed.category.bills"     = "الفواتير";
+"seed.category.dining"    = "المطاعم";
+"seed.category.salary"    = "الراتب";
+
+// Seed data — item names
+"seed.item.banana"        = "موز";
+"seed.item.apple"         = "تفاح";
+"seed.item.tomato"        = "طماطم";
+"seed.item.carrot"        = "جزر";
+"seed.item.fuel"          = "وقود";
+"seed.item.loan"          = "قرض";
+"seed.item.maintenance"   = "صيانة";
+"seed.item.rent"          = "إيجار";
+"seed.item.internet"      = "إنترنت";
+"seed.item.electricity"   = "كهرباء";
+"seed.item.coffee"        = "قهوة";
+"seed.item.monthlySalary" = "الراتب الشهري";
+
+// Seed data — group names
+"seed.group.fruits"       = "فواكه";
+"seed.group.vegetables"   = "خضروات";
+"seed.group.dairy"        = "ألبان";
+"seed.group.pantry"       = "مؤونة";
+"seed.group.protein"      = "بروتين";
+
+// Seed data — grocery presets
+"seed.preset.milk"        = "حليب";
+"seed.preset.rice"        = "أرز";
+"seed.preset.chicken"     = "دجاج";
+"seed.preset.orange"      = "برتقال";

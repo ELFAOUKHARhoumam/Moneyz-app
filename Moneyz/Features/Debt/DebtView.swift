@@ -30,6 +30,7 @@ struct DebtView: View {
                 .ignoresSafeArea()
 
             List {
+                // Filter picker
                 Section {
                     Picker(AppLocalizer.string("debt.filter"), selection: $viewModel.filter) {
                         ForEach(DebtViewModel.Filter.allCases) { filter in
@@ -37,12 +38,13 @@ struct DebtView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .premiumCard(cornerRadius: 24, padding: 8)
+                    .premiumCard(cornerRadius: PremiumTheme.CornerRadius.md, padding: PremiumTheme.Spacing.xs)
                 }
                 .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 10, trailing: 20))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
+                // Summary cards
                 Section {
                     VStack(spacing: 14) {
                         SummaryCardView(
@@ -59,7 +61,6 @@ struct DebtView: View {
                                 subtitleText: nil,
                                 systemImage: "arrow.down.circle.fill"
                             )
-
                             SummaryCardView(
                                 titleKey: DebtDirection.iOwe.localizedKey,
                                 valueText: CurrencyFormatter.string(from: -summary.iOweMinor, currencyCode: settings.currencyCode, locale: settings.locale),
@@ -72,12 +73,14 @@ struct DebtView: View {
                             debtStatusMetric(
                                 title: AppLocalizer.string("debt.summary.overdue"),
                                 value: "\(summary.overdueCount)",
-                                accent: PremiumTheme.Palette.danger
+                                accent: summary.overdueCount > 0 ? PremiumTheme.Palette.danger : .secondary,
+                                isUrgent: summary.overdueCount > 0
                             )
                             debtStatusMetric(
                                 title: AppLocalizer.string("debt.summary.dueSoon"),
                                 value: "\(summary.dueSoonCount)",
-                                accent: PremiumTheme.Palette.warning
+                                accent: summary.dueSoonCount > 0 ? PremiumTheme.Palette.warning : .secondary,
+                                isUrgent: false
                             )
                         }
                     }
@@ -86,6 +89,7 @@ struct DebtView: View {
                     .listRowSeparator(.hidden)
                 }
 
+                // Debt rows
                 Section {
                     if filteredDebts.isEmpty {
                         EmptyStateView(
@@ -100,8 +104,18 @@ struct DebtView: View {
                         ForEach(filteredDebts, id: \.id) { debt in
                             debtCard(debt)
                                 .contentShape(Rectangle())
-                                .onTapGesture {
-                                    viewModel.presentEditor(for: debt)
+                                .onTapGesture { viewModel.presentEditor(for: debt) }
+                                // Leading swipe: Mark as Settled — most common resolution action
+                                // Previously required opening the full edit sheet
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    if debt.status != .settled {
+                                        Button {
+                                            markAsSettled(debt)
+                                        } label: {
+                                            Label(AppLocalizer.string("status.settled"), systemImage: "checkmark.circle.fill")
+                                        }
+                                        .tint(PremiumTheme.Palette.success)
+                                    }
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
@@ -109,7 +123,6 @@ struct DebtView: View {
                                     } label: {
                                         Label(AppLocalizer.string("common.delete"), systemImage: "trash")
                                     }
-
                                     Button {
                                         viewModel.presentEditor(for: debt)
                                     } label: {
@@ -136,6 +149,8 @@ struct DebtView: View {
                     viewModel.presentEditor()
                 } label: {
                     Image(systemName: "plus.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, PremiumTheme.Palette.accent)
                 }
             }
         }
@@ -146,6 +161,8 @@ struct DebtView: View {
                 DebtEditorView(debt: viewModel.editingDebt)
             }
         }
+        // FIX: alert previously used "common.error" / "common.ok" keys missing from .strings files.
+        // Now uses "common.cancel" (exists) + the new "common.ok" added in LocalizationAdditions.
         .alert(
             Text(AppLocalizer.string("common.error")),
             isPresented: Binding(
@@ -171,6 +188,7 @@ struct DebtView: View {
         ) {
             Button(AppLocalizer.string("common.delete"), role: .destructive) {
                 viewModel.confirmDelete(in: modelContext)
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             }
             Button(AppLocalizer.string("common.cancel"), role: .cancel) {
                 viewModel.cancelPendingDelete()
@@ -180,8 +198,32 @@ struct DebtView: View {
         }
     }
 
+    // MARK: - Mark as Settled
+    // FIX: sets updatedAt = .now so the @Query(sort: updatedAt) reorders the row correctly.
+    // Previously: status was set but updatedAt was not updated, so the sort order wouldn't reflect
+    // the change and the settled item might stay at the top of the list.
+    private func markAsSettled(_ debt: DebtRecord) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+            debt.status = .settled
+            debt.updatedAt = .now   // required for correct @Query sort behavior
+            do {
+                try modelContext.save()
+            } catch {
+                viewModel.errorMessage = error.localizedDescription
+            }
+        }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+
+    // MARK: - Debt Card
+
     private func debtCard(_ debt: DebtRecord) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let isOverdue: Bool = {
+            guard let dueDate = debt.dueDate, debt.status != .settled else { return false }
+            return dueDate < Date()
+        }()
+
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 PremiumTheme.IconBadge(
                     systemImage: debt.direction == .owedToMe ? "arrow.down.left" : "arrow.up.right",
@@ -195,7 +237,6 @@ struct DebtView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(debt.counterpartyName)
                         .font(.headline)
-
                     Text(AppLocalizer.string(debt.direction.localizedKey))
                         .font(.caption)
                         .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
@@ -203,22 +244,48 @@ struct DebtView: View {
 
                 Spacer()
 
-                Text(CurrencyFormatter.string(from: debt.amountMinor * (debt.direction == .owedToMe ? 1 : -1), currencyCode: settings.currencyCode, locale: settings.locale))
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(CurrencyFormatter.string(
+                        from: debt.amountMinor * (debt.direction == .owedToMe ? 1 : -1),
+                        currencyCode: settings.currencyCode,
+                        locale: settings.locale
+                    ))
                     .font(.body.weight(.bold))
                     .monospacedDigit()
+
+                    // Status badge
+                    Text(AppLocalizer.string(debt.status.localizedKey))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(debt.status == .settled ? PremiumTheme.Palette.success : .secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule().fill(
+                                debt.status == .settled
+                                    ? PremiumTheme.Palette.success.opacity(0.12)
+                                    : PremiumTheme.Palette.neutralFill
+                            )
+                        )
+                }
             }
 
             HStack {
-                Text(AppLocalizer.string(debt.status.localizedKey))
+                if isOverdue {
+                    Label(AppLocalizer.string("debt.summary.overdue"), systemImage: "exclamationmark.circle.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(PremiumTheme.Palette.danger)
+                }
                 Spacer()
                 if let dueDate = debt.dueDate {
                     Text(dueDate, format: .dateTime.day().month().year())
+                        .font(.caption)
+                        .foregroundStyle(isOverdue ? PremiumTheme.Palette.danger : .secondary)
                 } else {
                     Text(debt.issueDate, format: .dateTime.day().month().year())
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
 
             if !debt.note.isEmpty {
                 Text(debt.note)
@@ -226,38 +293,49 @@ struct DebtView: View {
                     .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
             }
         }
-        .premiumCard(cornerRadius: 24, padding: 16)
+        .premiumCard(cornerRadius: PremiumTheme.CornerRadius.md, padding: PremiumTheme.Spacing.md)
+        // Overdue items get a red border for immediate visual urgency
+        .overlay(
+            isOverdue
+                ? RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.md, style: .continuous)
+                    .strokeBorder(PremiumTheme.Palette.danger.opacity(0.4), lineWidth: 1.5)
+                : nil
+        )
     }
 
-    private func debtStatusMetric(title: String, value: String, accent: Color) -> some View {
+    // MARK: - Metric Card
+
+    private func debtStatusMetric(title: String, value: String, accent: Color, isUrgent: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
-
             Text(value)
                 .font(.subheadline.weight(.bold))
                 .monospacedDigit()
                 .foregroundStyle(accent)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .premiumSecondaryCard(cornerRadius: 20, padding: 14)
+        .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.sm, padding: 14)
+        .overlay(
+            isUrgent
+                ? RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.sm, style: .continuous)
+                    .strokeBorder(accent.opacity(0.3), lineWidth: 1)
+                : nil
+        )
     }
 }
 
+// MARK: - Preview
 @MainActor
 private struct DebtViewPreviewHost: View {
     @StateObject private var settings = SettingsStore()
 
     var body: some View {
-        NavigationStack {
-            DebtView()
-        }
-        .environmentObject(settings)
-        .modelContainer(PreviewContainer.modelContainer)
+        NavigationStack { DebtView() }
+            .environmentObject(settings)
+            .modelContainer(PreviewContainer.modelContainer)
     }
 }
 
-#Preview {
-    DebtViewPreviewHost()
-}
+#Preview { DebtViewPreviewHost() }

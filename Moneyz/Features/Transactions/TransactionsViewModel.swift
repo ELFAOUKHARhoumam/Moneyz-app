@@ -23,7 +23,6 @@ final class TransactionsViewModel: ObservableObject {
     @Published var filter: Filter = .all
     @Published var showingAddSheet = false
     @Published var showingCategoryManager = false
-    @Published var showingGrocery = false
     @Published var editingTransaction: MoneyTransaction?
     @Published var pendingDeletionTransaction: MoneyTransaction?
     @Published var errorMessage: String?

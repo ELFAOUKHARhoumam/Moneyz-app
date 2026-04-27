@@ -1,9 +1,13 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - RootTabView
+// Updated to wire the onShowAllTransactions callback from HomeView → Transactions tab.
+// This avoids NavigationLink-in-ScrollView push issues while keeping HomeView tab-agnostic.
+
 @MainActor
 struct RootTabView: View {
-    private enum AppTab: String, Hashable {
+    enum AppTab: String, Hashable {
         case home
         case transactions
         case budget
@@ -32,8 +36,11 @@ struct RootTabView: View {
                 .ignoresSafeArea()
 
             TabView(selection: selectedTab) {
+                // Home tab — receives the callback to switch to Transactions
                 NavigationStack {
-                    HomeView()
+                    HomeView(onShowAllTransactions: {
+                        selectedTabRawValue = AppTab.transactions.rawValue
+                    })
                 }
                 .tag(AppTab.home)
                 .tabItem {

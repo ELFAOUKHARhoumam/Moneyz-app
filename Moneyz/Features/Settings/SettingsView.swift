@@ -56,6 +56,8 @@ struct SettingsView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
+
+                    // MARK: Profile
                     sectionCard(titleKey: "settings.profile") {
                         VStack(spacing: 14) {
                             inputField(
@@ -86,13 +88,19 @@ struct SettingsView: View {
                                 keyboardType: .decimalPad
                             )
 
+                            // FIX: salary cycle stepper label was duplicated.
+                            // Root cause: the VStack label `Text` said "Salary cycle starts on day"
+                            // AND the stepper row also prepended the same string, producing:
+                            // "Salary cycle starts on day  Salary cycle starts on day 1"
+                            // Fix: section label provides context, stepper row shows only the number.
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(AppLocalizer.string("settings.salaryCycleStart"))
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
 
                                 HStack {
-                                    Text("\(AppLocalizer.string("settings.salaryCycleStart")) \(settings.salaryCycleStartDay)")
+                                    // Only show the day number, not the full label again
+                                    Text(AppLocalizer.string("onboarding.paycheckValue") + " \(settings.salaryCycleStartDay)")
                                         .font(.subheadline.weight(.medium))
 
                                     Spacer()
@@ -100,11 +108,12 @@ struct SettingsView: View {
                                     Stepper("", value: $settings.salaryCycleStartDay, in: 1...28)
                                         .labelsHidden()
                                 }
-                                .premiumSecondaryCard(cornerRadius: 18, padding: 14)
+                                .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.sm, padding: 14)
                             }
 
                             Button(AppLocalizer.string("common.save")) {
                                 viewModel.applyOpeningBalance(to: settings)
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }
                             .premiumPrimaryButton()
 
@@ -116,6 +125,7 @@ struct SettingsView: View {
                         }
                     }
 
+                    // MARK: Appearance
                     sectionCard(titleKey: "settings.appearance") {
                         VStack(spacing: 14) {
                             pickerCard(title: AppLocalizer.string("settings.theme")) {
@@ -145,14 +155,34 @@ struct SettingsView: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
+
+                            // FIX: Dashboard style picker moved from HomeView to Settings.
+                            // Root cause: the style toggle consumed permanent space on the home screen,
+                            // reducing prime content area. It's a preference, not a daily interaction.
+                            pickerCard(title: AppLocalizer.string("dashboard.style.label")) {
+                                ForEach(SettingsStore.HomeOverviewStyle.allCases) { style in
+                                    Button {
+                                        settings.homeOverviewStyle = style
+                                    } label: {
+                                        Text(AppLocalizer.string(style.localizedKey))
+                                    }
+                                }
+                            } summary: {
+                                Text(AppLocalizer.string(settings.homeOverviewStyle.localizedKey))
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
 
+                    // MARK: Security
                     sectionCard(titleKey: "settings.security") {
                         VStack(spacing: 14) {
                             toggleCard(
                                 title: AppLocalizer.string("settings.pin"),
-                                subtitle: settings.usePINLock && viewModel.hasStoredPIN ? AppLocalizer.string("settings.pin.enabled") : nil,
+                                subtitle: settings.usePINLock && viewModel.hasStoredPIN
+                                    ? AppLocalizer.string("settings.pin.enabled")
+                                    : nil,
                                 isOn: pinToggleBinding
                             )
 
@@ -164,18 +194,23 @@ struct SettingsView: View {
                                         .frame(maxWidth: .infinity)
                                 }
                                 .buttonStyle(.plain)
-                                .premiumSecondaryCard(cornerRadius: 18, padding: 14)
+                                .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.sm, padding: 14)
                             }
 
+                            // FIX: biometricsAvailable now refreshes on appear (see .onAppear below)
+                            // Root cause: was computed once at SettingsViewModel.init() time
                             toggleCard(
                                 title: AppLocalizer.string("settings.faceID"),
-                                subtitle: viewModel.biometricsAvailable ? nil : AppLocalizer.string("settings.faceID.unavailable"),
+                                subtitle: viewModel.biometricsAvailable
+                                    ? nil
+                                    : AppLocalizer.string("settings.faceID.unavailable"),
                                 isOn: $settings.useFaceIDLock
                             )
                             .disabled(!viewModel.biometricsAvailable)
                         }
                     }
 
+                    // MARK: Sync
                     sectionCard(titleKey: "settings.sync") {
                         VStack(spacing: 14) {
                             VStack(alignment: .leading, spacing: 10) {
@@ -195,7 +230,7 @@ struct SettingsView: View {
                                         .foregroundStyle(PremiumTheme.Palette.mutedText(for: colorScheme))
                                 }
                             }
-                            .premiumSecondaryCard(cornerRadius: 18, padding: 14)
+                            .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.sm, padding: 14)
 
                             Button {
                                 viewModel.refreshSyncStatus()
@@ -204,14 +239,16 @@ struct SettingsView: View {
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.plain)
-                            .premiumSecondaryCard(cornerRadius: 18, padding: 14)
+                            .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.sm, padding: 14)
                         }
                     }
 
+                    // MARK: Data
                     sectionCard(titleKey: "settings.data") {
                         VStack(alignment: .leading, spacing: 14) {
                             Button {
                                 viewModel.applyRecurring(in: modelContext)
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             } label: {
                                 Label(AppLocalizer.string("settings.applyRecurring"), systemImage: "repeat.circle.fill")
                             }
@@ -225,6 +262,7 @@ struct SettingsView: View {
                                             ? PremiumTheme.Palette.danger
                                             : PremiumTheme.Palette.mutedText(for: colorScheme)
                                     )
+                                    .transition(.opacity)
                             }
 
                             Text(AppLocalizer.string("settings.data.footer"))
@@ -249,11 +287,17 @@ struct SettingsView: View {
         .onAppear {
             viewModel.syncOpeningBalance(from: settings)
             viewModel.refreshSyncStatus()
+            // FIX: refresh biometrics availability on every appear
+            // Root cause: LAContext.canEvaluatePolicy returns current device state —
+            // calling it fresh on appear handles the "enabled Face ID while app was open" case
+            viewModel.refreshBiometricsAvailability()
         }
         .onChange(of: settings.languagePreference) { _, _ in
             viewModel.syncOpeningBalance(from: settings)
         }
     }
+
+    // MARK: - Private Helpers
 
     private func sectionCard<Content: View>(titleKey: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -262,7 +306,7 @@ struct SettingsView: View {
 
             content()
         }
-        .premiumCard(cornerRadius: 28, padding: 18)
+        .premiumCard(cornerRadius: PremiumTheme.CornerRadius.lg, padding: PremiumTheme.Spacing.md)
     }
 
     private func inputField(
@@ -282,11 +326,11 @@ struct SettingsView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 14)
                 .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.sm, style: .continuous)
                         .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.sm, style: .continuous)
                         .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
                 )
         }
@@ -315,11 +359,11 @@ struct SettingsView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 14)
                 .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.sm, style: .continuous)
                         .fill(PremiumTheme.Palette.elevatedSurfaceFill(for: colorScheme))
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    RoundedRectangle(cornerRadius: PremiumTheme.CornerRadius.sm, style: .continuous)
                         .strokeBorder(PremiumTheme.Palette.borderColor(for: colorScheme), lineWidth: 1)
                 )
             }
@@ -345,6 +389,6 @@ struct SettingsView: View {
             Toggle("", isOn: isOn)
                 .labelsHidden()
         }
-        .premiumSecondaryCard(cornerRadius: 18, padding: 14)
+        .premiumSecondaryCard(cornerRadius: PremiumTheme.CornerRadius.sm, padding: 14)
     }
 }
