@@ -20,15 +20,18 @@ final class RecurringRuleEditorViewModel: ObservableObject {
 
     let existingRule: RecurringTransactionRule?
 
+    private let calendar: Calendar
     private let saveRuleAction: SaveRuleAction
     private let deleteRuleAction: DeleteRuleAction
 
     init(
         rule: RecurringTransactionRule?,
+        calendar: Calendar = .current,
         saveRuleAction: SaveRuleAction? = nil,
         deleteRuleAction: DeleteRuleAction? = nil
     ) {
         existingRule = rule
+        self.calendar = calendar
         title = rule?.title ?? ""
         amountText = CurrencyFormatter.decimalString(from: rule?.amountMinor ?? 0)
         kind = rule?.kind ?? .expense
@@ -76,7 +79,7 @@ final class RecurringRuleEditorViewModel: ObservableObject {
             amountMinor: amountMinor,
             kind: kind,
             frequency: frequency,
-            nextRunDate: Calendar.current.startOfDay(for: nextRunDate),
+            nextRunDate: calendar.startOfDay(for: nextRunDate),
             note: note.trimmingCharacters(in: .whitespacesAndNewlines),
             category: selectedCategory,
             item: selectedItem,
