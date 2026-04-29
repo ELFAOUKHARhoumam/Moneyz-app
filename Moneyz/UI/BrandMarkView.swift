@@ -7,6 +7,8 @@ struct BrandMarkView: View {
     let size: CGFloat
     var cornerRadius: CGFloat = 20
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         Group {
             if let image = brandUIImage {
@@ -51,8 +53,9 @@ struct BrandMarkView: View {
     }
 
     private var brandUIImage: UIImage? {
-        // Prefer a dedicated premium asset if present, otherwise fall back.
-        // This lets us swap premium branding without breaking builds.
-        UIImage(named: "PremiumBrandMark") ?? UIImage(named: "BrandMark")
+        // Use the new brand assets only.
+        UIImage(named: colorScheme == .dark ? "BrandMarkDark" : "BrandMarkGreen")
+            ?? UIImage(named: "BrandMarkGreenLogo")
+            ?? UIImage(named: "BrandMarkLight")
     }
 }

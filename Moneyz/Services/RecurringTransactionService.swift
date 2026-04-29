@@ -33,7 +33,6 @@ struct RecurringTransactionService {
 
                 if try hasExistingTransaction(for: rule, on: scheduledDay, in: context) {
                     logger.warning("Skipping duplicate recurring transaction for rule \(rule.id.uuidString, privacy: .public) on \(scheduledDay, privacy: .public)")
-                    rule.lastAppliedAt = referenceDate
                     rule.nextRunDate = rule.frequency.nextDate(after: scheduledDay, calendar: calendar)
                     hasChanges = true
                     continue
@@ -71,12 +70,20 @@ struct RecurringTransactionService {
     }
 
     private func hasExistingTransaction(for rule: RecurringTransactionRule, on scheduledDay: Date, in context: ModelContext) throws -> Bool {
-        let descriptor = FetchDescriptor<MoneyTransaction>()
+        let startOfDay = calendar.startOfDay(for: scheduledDay)
+        let startOfNextDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? startOfDay.addingTimeInterval(86_400)
+        let ruleID = rule.id
 
-        return try context.fetch(descriptor).contains { transaction in
-            transaction.isRecurringInstance &&
-            transaction.recurringSourceID == rule.id &&
-            calendar.isDate(transaction.transactionDate, inSameDayAs: scheduledDay)
-        }
+        var descriptor = FetchDescriptor<MoneyTransaction>(
+            predicate: #Predicate<MoneyTransaction> { transaction in
+                transaction.isRecurringInstance &&
+                transaction.recurringSourceID == ruleID &&
+                transaction.transactionDate >= startOfDay &&
+                transaction.transactionDate < startOfNextDay
+            }
+        )
+        descriptor.fetchLimit = 1
+        descriptor.propertiesToFetch = [\.id]
+        return try !context.fetch(descriptor).isEmpty
     }
 }

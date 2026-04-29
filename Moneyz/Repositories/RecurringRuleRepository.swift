@@ -27,28 +27,31 @@ struct RecurringRuleRepository {
         let normalizedNextRunDate = calendar.startOfDay(for: draft.nextRunDate)
 
         if let existing {
-            existing.title = trimmedTitle
-            existing.amountMinor = draft.amountMinor
-            existing.kind = draft.kind
-            existing.frequency = draft.frequency
-            existing.nextRunDate = normalizedNextRunDate
-            existing.note = draft.note
-            existing.category = draft.category
-            existing.item = draft.item
-            existing.person = draft.person
+            update(existing, with: draft, title: trimmedTitle, nextRunDate: normalizedNextRunDate)
         } else {
-            let rule = RecurringTransactionRule(
+            if let duplicate = try findDuplicate(
                 title: trimmedTitle,
-                amountMinor: draft.amountMinor,
                 kind: draft.kind,
                 frequency: draft.frequency,
-                nextRunDate: normalizedNextRunDate,
-                note: draft.note,
-                category: draft.category,
-                item: draft.item,
-                person: draft.person
-            )
-            context.insert(rule)
+                amountMinor: draft.amountMinor,
+                in: context
+            ) {
+                update(duplicate, with: draft, title: trimmedTitle, nextRunDate: normalizedNextRunDate)
+                duplicate.isActive = true
+            } else {
+                let rule = RecurringTransactionRule(
+                    title: trimmedTitle,
+                    amountMinor: draft.amountMinor,
+                    kind: draft.kind,
+                    frequency: draft.frequency,
+                    nextRunDate: normalizedNextRunDate,
+                    note: draft.note,
+                    category: draft.category,
+                    item: draft.item,
+                    person: draft.person
+                )
+                context.insert(rule)
+            }
         }
 
         try context.save()
@@ -57,5 +60,34 @@ struct RecurringRuleRepository {
     func delete(_ rule: RecurringTransactionRule, in context: ModelContext) throws {
         context.delete(rule)
         try context.save()
+    }
+
+    private func update(_ rule: RecurringTransactionRule, with draft: RecurringRuleDraft, title: String, nextRunDate: Date) {
+        rule.title = title
+        rule.amountMinor = draft.amountMinor
+        rule.kind = draft.kind
+        rule.frequency = draft.frequency
+        rule.nextRunDate = nextRunDate
+        rule.note = draft.note
+        rule.category = draft.category
+        rule.item = draft.item
+        rule.person = draft.person
+    }
+
+    private func findDuplicate(
+        title: String,
+        kind: TransactionKind,
+        frequency: RecurringFrequency,
+        amountMinor: Int64,
+        in context: ModelContext
+    ) throws -> RecurringTransactionRule? {
+        let all = try context.fetch(FetchDescriptor<RecurringTransactionRule>())
+        return all.first { rule in
+            rule.title.trimmingCharacters(in: .whitespacesAndNewlines)
+                .caseInsensitiveCompare(title) == .orderedSame &&
+            rule.kind == kind &&
+            rule.frequency == frequency &&
+            rule.amountMinor == amountMinor
+        }
     }
 }

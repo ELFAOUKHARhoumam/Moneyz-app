@@ -14,13 +14,25 @@ final class BudgetViewModel: ObservableObject {
 
     private let insightsService = BudgetInsightsService()
     private let deleteRuleAction: @MainActor (RecurringTransactionRule, ModelContext) throws -> Void
+    private let toggleActiveAction: @MainActor (RecurringTransactionRule, ModelContext) throws -> Void
 
     init(
-        deleteRuleAction: (@MainActor (RecurringTransactionRule, ModelContext) throws -> Void)? = nil
+        deleteRuleAction: (@MainActor (RecurringTransactionRule, ModelContext) throws -> Void)? = nil,
+        toggleActiveAction: (@MainActor (RecurringTransactionRule, ModelContext) throws -> Void)? = nil
     ) {
         self.deleteRuleAction = deleteRuleAction ?? { rule, context in
             try RecurringRuleRepository().delete(rule, in: context)
         }
+        self.toggleActiveAction = toggleActiveAction ?? { rule, context in
+            rule.isActive.toggle()
+            try context.save()
+        }
+    }
+
+    convenience init(
+        _ deleteRuleAction: @escaping @MainActor (RecurringTransactionRule, ModelContext) throws -> Void
+    ) {
+        self.init(deleteRuleAction: deleteRuleAction, toggleActiveAction: nil)
     }
 
     func interval(settings: SettingsStore) -> DateInterval {
@@ -74,5 +86,14 @@ final class BudgetViewModel: ObservableObject {
 
     func cancelPendingDelete() {
         pendingDeletionRule = nil
+    }
+
+    func toggleActive(_ rule: RecurringTransactionRule, in context: ModelContext) {
+        do {
+            try toggleActiveAction(rule, context)
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }
